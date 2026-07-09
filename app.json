@@ -32,6 +32,13 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Приложению нужен доступ к галерее, чтобы выбрать фото блюда.",
+          "cameraPermission": "Приложению нужен доступ к камере, чтобы сфотографировать блюдо."
+        }
       ]
     ],
     "experiments": {
