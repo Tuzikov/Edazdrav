@@ -27,14 +27,18 @@ export function scaleIngredient(ingredient: Ingredient): NutrientTotals {
 }
 
 export function sumIngredients(ingredients: Ingredient[]): NutrientTotals {
-  return ingredients.reduce((acc, ingredient) => {
-    const scaled = scaleIngredient(ingredient);
-    return {
-      calories: acc.calories + scaled.calories,
-      protein: acc.protein + scaled.protein,
-      fat: acc.fat + scaled.fat,
-      carbs: acc.carbs + scaled.carbs,
-      fiber: acc.fiber + scaled.fiber,
-    };
-  }, EMPTY_TOTALS);
+  return sumTotals(ingredients.map(scaleIngredient));
+}
+
+export function sumTotals(totalsList: NutrientTotals[]): NutrientTotals {
+  return totalsList.reduce(
+    (acc, totals) => ({
+      calories: acc.calories + totals.calories,
+      protein: acc.protein + totals.protein,
+      fat: acc.fat + totals.fat,
+      carbs: acc.carbs + totals.carbs,
+      fiber: acc.fiber + totals.fiber,
+    }),
+    EMPTY_TOTALS
+  );
 }

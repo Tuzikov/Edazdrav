@@ -17,6 +17,7 @@ type MealsContextValue = {
   meals: Meal[];
   isLoaded: boolean;
   addMeal: (photoUri: string | null, ingredients: Ingredient[]) => void;
+  updateMeal: (id: string, ingredients: Ingredient[]) => void;
 };
 
 const MealsContext = createContext<MealsContextValue | null>(null);
@@ -51,7 +52,13 @@ export function MealsProvider({ children }: { children: ReactNode }) {
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   }
 
-  return <MealsContext.Provider value={{ meals, isLoaded, addMeal }}>{children}</MealsContext.Provider>;
+  function updateMeal(id: string, ingredients: Ingredient[]) {
+    const next = meals.map((meal) => (meal.id === id ? { ...meal, ingredients, totals: sumIngredients(ingredients) } : meal));
+    setMeals(next);
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  }
+
+  return <MealsContext.Provider value={{ meals, isLoaded, addMeal, updateMeal }}>{children}</MealsContext.Provider>;
 }
 
 export function useMeals() {
