@@ -2,10 +2,17 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 
 import type { Ingredient } from '@/lib/nutrition';
 
+type DraftPhoto = {
+  uri: string;
+  base64: string;
+  mimeType: string;
+};
+
 type DraftMealContextValue = {
   photoUri: string | null;
+  photo: DraftPhoto | null;
   ingredients: Ingredient[];
-  setPhotoUri: (uri: string | null) => void;
+  setPhoto: (photo: DraftPhoto | null) => void;
   setIngredients: (ingredients: Ingredient[]) => void;
   updateIngredientGrams: (id: string, grams: number) => void;
   removeIngredient: (id: string) => void;
@@ -18,7 +25,7 @@ const DraftMealContext = createContext<DraftMealContextValue | null>(null);
 // Черновик текущего добавляемого блюда — живёт только в памяти на время
 // flow "камера → анализ → проверка", не сохраняется в AsyncStorage.
 export function DraftMealProvider({ children }: { children: ReactNode }) {
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<DraftPhoto | null>(null);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
   function updateIngredientGrams(id: string, grams: number) {
@@ -34,13 +41,23 @@ export function DraftMealProvider({ children }: { children: ReactNode }) {
   }
 
   function reset() {
-    setPhotoUri(null);
+    setPhoto(null);
     setIngredients([]);
   }
 
   return (
     <DraftMealContext.Provider
-      value={{ photoUri, ingredients, setPhotoUri, setIngredients, updateIngredientGrams, removeIngredient, addIngredient, reset }}>
+      value={{
+        photoUri: photo?.uri ?? null,
+        photo,
+        ingredients,
+        setPhoto,
+        setIngredients,
+        updateIngredientGrams,
+        removeIngredient,
+        addIngredient,
+        reset,
+      }}>
       {children}
     </DraftMealContext.Provider>
   );

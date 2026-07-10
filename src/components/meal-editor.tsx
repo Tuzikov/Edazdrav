@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState, type ReactNode } from 'react';
-import { FlatList, Image, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { createManualIngredient } from '@/lib/mock-analysis';
+import { lookupIngredientOnline } from '@/lib/meal-analysis-api';
 import { sumIngredients, type Ingredient } from '@/lib/nutrition';
 
 type Props = {
@@ -23,17 +23,27 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
   const [newName, setNewName] = useState('');
   const [newGrams, setNewGrams] = useState('100');
   const [isAdding, setIsAdding] = useState(false);
+  const [isLookingUp, setIsLookingUp] = useState(false);
 
   const totals = useMemo(() => sumIngredients(ingredients), [ingredients]);
 
-  function handleAddIngredient() {
+  async function handleAddIngredient() {
     const name = newName.trim();
-    if (!name) return;
+    if (!name || isLookingUp) return;
     const grams = Number(newGrams);
-    onAddIngredient(createManualIngredient(name, Number.isNaN(grams) || grams <= 0 ? 100 : grams));
-    setNewName('');
-    setNewGrams('100');
-    setIsAdding(false);
+
+    setIsLookingUp(true);
+    try {
+      const ingredient = await lookupIngredientOnline(name, Number.isNaN(grams) || grams <= 0 ? 100 : grams);
+      onAddIngredient(ingredient);
+      setNewName('');
+      setNewGrams('100');
+      setIsAdding(false);
+    } catch {
+      Alert.alert('Не получилось найти продукт', 'Проверьте подключение к интернету и попробуйте ещё раз.');
+    } finally {
+      setIsLookingUp(false);
+    }
   }
 
   return (
@@ -82,6 +92,7 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
                 value={newName}
                 onChangeText={setNewName}
                 autoFocus
+                editable={!isLookingUp}
                 onSubmitEditing={handleAddIngredient}
               />
               <TextInput
@@ -91,12 +102,17 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
                 placeholderTextColor={theme.textSecondary}
                 value={newGrams}
                 onChangeText={setNewGrams}
+                editable={!isLookingUp}
                 onSubmitEditing={handleAddIngredient}
               />
-              <Pressable onPress={handleAddIngredient} style={styles.addConfirm}>
-                <ThemedText type="smallBold" style={styles.addConfirmText}>
-                  Добавить
-                </ThemedText>
+              <Pressable onPress={handleAddIngredient} style={styles.addConfirm} disabled={isLookingUp}>
+                {isLookingUp ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <ThemedText type="smallBold" style={styles.addConfirmText}>
+                    Добавить
+                  </ThemedText>
+                )}
               </Pressable>
             </View>
           ) : (

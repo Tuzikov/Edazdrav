@@ -1,35 +1,51 @@
 import { router } from 'expo-router';
-import { useEffect } from 'react';
-import { ActivityIndicator, Image, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDraftMeal } from '@/context/draft-meal-context';
-import { mockAnalyzeMeal } from '@/lib/mock-analysis';
+import { analyzeMealPhoto } from '@/lib/meal-analysis-api';
 
 export default function AnalyzingScreen() {
-  const { photoUri, setIngredients } = useDraftMeal();
+  const { photo, setIngredients } = useDraftMeal();
+  const [isRetrying, setIsRetrying] = useState(0);
 
   useEffect(() => {
+    if (!photo) {
+      router.back();
+      return;
+    }
+
     let cancelled = false;
-    mockAnalyzeMeal(photoUri ?? '').then((ingredients) => {
-      if (cancelled) return;
-      setIngredients(ingredients);
-      router.replace('/add-meal/review');
-    });
+
+    analyzeMealPhoto(photo.base64, photo.mimeType)
+      .then((ingredients) => {
+        if (cancelled) return;
+        setIngredients(ingredients);
+        router.replace('/add-meal/review');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        Alert.alert('Не получилось распознать блюдо', 'Проверьте подключение к интернету и попробуйте ещё раз.', [
+          { text: 'Назад', style: 'cancel', onPress: () => router.back() },
+          { text: 'Повторить', onPress: () => setIsRetrying((n) => n + 1) },
+        ]);
+      });
+
     return () => {
       cancelled = true;
     };
-    // Анализ запускается один раз при входе на экран, независимо от последующих рендеров.
+    // Анализ перезапускается либо при входе на экран, либо при нажатии "Повторить".
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isRetrying]);
 
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-        {photoUri && <Image source={{ uri: photoUri }} style={styles.photo} />}
+        {photo && <Image source={{ uri: photo.uri }} style={styles.photo} />}
         <ActivityIndicator size="large" color="#3c87f7" style={styles.spinner} />
         <ThemedText type="default">Распознаём блюдо…</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">

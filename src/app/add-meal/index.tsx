@@ -9,8 +9,13 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDraftMeal } from '@/context/draft-meal-context';
 
+function mimeTypeFromAsset(asset: ImagePicker.ImagePickerAsset): string {
+  if (asset.mimeType) return asset.mimeType;
+  return asset.uri.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+}
+
 export default function AddMealSourceScreen() {
-  const { setPhotoUri, reset } = useDraftMeal();
+  const { setPhoto, reset } = useDraftMeal();
 
   async function handlePhoto(source: 'camera' | 'library') {
     reset();
@@ -22,12 +27,18 @@ export default function AddMealSourceScreen() {
       return;
     }
 
-    const result =
-      source === 'camera' ? await ImagePicker.launchCameraAsync({ quality: 0.6 }) : await ImagePicker.launchImageLibraryAsync({ quality: 0.6 });
+    const options: ImagePicker.ImagePickerOptions = { quality: 0.6, base64: true };
+    const result = source === 'camera' ? await ImagePicker.launchCameraAsync(options) : await ImagePicker.launchImageLibraryAsync(options);
 
     if (result.canceled || !result.assets?.[0]) return;
 
-    setPhotoUri(result.assets[0].uri);
+    const asset = result.assets[0];
+    if (!asset.base64) {
+      Alert.alert('Не получилось обработать фото', 'Попробуйте выбрать другое фото.');
+      return;
+    }
+
+    setPhoto({ uri: asset.uri, base64: asset.base64, mimeType: mimeTypeFromAsset(asset) });
     router.push('/add-meal/analyzing');
   }
 
