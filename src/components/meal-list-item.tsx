@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -11,7 +12,7 @@ function formatTime(iso: string) {
 
 export function MealListItem({ meal }: { meal: Meal }) {
   return (
-    <View style={styles.row}>
+    <Pressable style={styles.row} onPress={() => router.push(`/meal/${meal.id}`)}>
       {meal.photoUri ? (
         <Image source={{ uri: meal.photoUri }} style={styles.thumb} />
       ) : (
@@ -28,7 +29,8 @@ export function MealListItem({ meal }: { meal: Meal }) {
         </ThemedText>
       </View>
       <ThemedText type="smallBold">{Math.round(meal.totals.calories)} ккал</ThemedText>
-    </View>
+      <Ionicons name="chevron-forward" size={18} color="#999" />
+    </Pressable>
   );
 }
 

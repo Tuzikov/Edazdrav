@@ -18,7 +18,7 @@ export default function AddMealLayout() {
         options={{
           title: 'Новое блюдо',
           headerLeft: () => (
-            <Pressable onPress={() => router.dismiss()} hitSlop={12}>
+            <Pressable onPress={() => router.dismissTo('/')} hitSlop={12}>
               <Ionicons name="close" size={24} color={theme.text} />
             </Pressable>
           ),
