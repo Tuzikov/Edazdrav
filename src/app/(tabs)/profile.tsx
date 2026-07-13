@@ -38,6 +38,9 @@ export default function ProfileScreen() {
     setDraft(stringifyGoals(goals));
   }
 
+  const savedDraft = stringifyGoals(goals);
+  const isDirty = FIELDS.some((field) => draft[field.key] !== savedDraft[field.key]);
+
   const ageNum = Number(age);
   const weightNum = Number(weight);
   const heightNum = Number(height);
@@ -196,9 +199,12 @@ export default function ProfileScreen() {
               </View>
             ))}
           </View>
-          <Pressable style={styles.saveButton} onPress={handleSave}>
-            <ThemedText type="smallBold" style={styles.saveButtonText}>
-              Сохранить
+          <Pressable
+            style={[styles.saveButton, !isDirty && styles.saveButtonSaved]}
+            onPress={handleSave}
+            disabled={!isDirty}>
+            <ThemedText type="smallBold" themeColor={isDirty ? undefined : 'textSecondary'} style={isDirty ? styles.saveButtonText : undefined}>
+              {isDirty ? 'Сохранить' : 'Сохранено'}
             </ThemedText>
           </Pressable>
         </ScrollView>
@@ -273,5 +279,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButtonDisabled: { opacity: 0.5 },
+  saveButtonSaved: { backgroundColor: 'rgba(120,120,128,0.24)' },
   saveButtonText: { color: '#fff' },
 });
