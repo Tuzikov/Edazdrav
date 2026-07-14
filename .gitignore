@@ -30,6 +30,9 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# design source files (not needed for the build)
+*.psd
+
 # local env files
 .env
 .env*.local
