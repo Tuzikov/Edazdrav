@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { MealListItem } from '@/components/meal-list-item';
 import { ThemedText } from '@/components/themed-text';
@@ -26,6 +26,7 @@ function dayKey(iso: string) {
 export default function HistoryScreen() {
   const { meals } = useMeals();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [metric, setMetric] = useState<MetricKey>('protein');
   const metricOption = METRIC_OPTIONS.find((option) => option.key === metric)!;
 
@@ -46,7 +47,7 @@ export default function HistoryScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={[styles.safeArea, { paddingTop: insets.top }]}>
         <ThemedText type="title" style={styles.pageTitle}>
           История
         </ThemedText>
@@ -94,7 +95,7 @@ export default function HistoryScreen() {
             </ThemedText>
           }
         />
-      </SafeAreaView>
+      </View>
     </ThemedView>
   );
 }

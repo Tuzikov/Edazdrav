@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -24,6 +24,7 @@ function stringifyGoals(goals: NutritionGoals): Record<string, string> {
 export default function ProfileScreen() {
   const { goals, updateGoals } = useProfile();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [draft, setDraft] = useState<Record<string, string>>(() => stringifyGoals(goals));
   const [syncedGoals, setSyncedGoals] = useState(goals);
 
@@ -65,7 +66,7 @@ export default function ProfileScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={[styles.safeArea, { paddingTop: insets.top }]}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <ThemedText type="title" style={styles.pageTitle}>
             Профиль
@@ -208,7 +209,7 @@ export default function ProfileScreen() {
             </ThemedText>
           </Pressable>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </ThemedView>
   );
 }

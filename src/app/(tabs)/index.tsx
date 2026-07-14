@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CalorieRing } from '@/components/calorie-ring';
 import { MacroCard } from '@/components/macro-card';
@@ -21,6 +21,7 @@ function isToday(iso: string) {
 export default function TodayScreen() {
   const { goals } = useProfile();
   const { meals } = useMeals();
+  const insets = useSafeAreaInsets();
 
   const todaysMeals = useMemo(() => meals.filter((meal) => isToday(meal.createdAt)), [meals]);
 
@@ -31,7 +32,7 @@ export default function TodayScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={[styles.safeArea, { paddingTop: insets.top }]}>
         <FlatList
           data={todaysMeals}
           keyExtractor={(item) => item.id}
@@ -65,7 +66,7 @@ export default function TodayScreen() {
         <Pressable style={styles.fab} onPress={() => router.push('/add-meal')}>
           <Ionicons name="camera" size={28} color="#fff" />
         </Pressable>
-      </SafeAreaView>
+      </View>
     </ThemedView>
   );
 }
