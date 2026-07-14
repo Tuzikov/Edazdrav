@@ -25,7 +25,7 @@ export default function AddMealLayout() {
         }}
       />
       <Stack.Screen name="analyzing" options={{ title: 'Анализ', headerBackVisible: false, gestureEnabled: false }} />
-      <Stack.Screen name="review" options={{ title: 'Проверьте результат', headerBackVisible: false, gestureEnabled: false }} />
+      <Stack.Screen name="review" options={{ title: 'Приём пищи', headerBackVisible: false, gestureEnabled: false }} />
     </Stack>
   );
 }

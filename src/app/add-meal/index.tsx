@@ -42,6 +42,11 @@ export default function AddMealSourceScreen() {
     router.push('/add-meal/analyzing');
   }
 
+  function handleManualEntry() {
+    reset();
+    router.push('/add-meal/review');
+  }
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['bottom']}>
@@ -56,6 +61,10 @@ export default function AddMealSourceScreen() {
           <Pressable style={styles.optionButton} onPress={() => handlePhoto('library')}>
             <Ionicons name="images-outline" size={32} color="#3c87f7" />
             <ThemedText type="smallBold">Выбрать из галереи</ThemedText>
+          </Pressable>
+          <Pressable style={styles.optionButton} onPress={handleManualEntry}>
+            <Ionicons name="create-outline" size={32} color="#3c87f7" />
+            <ThemedText type="smallBold">Добавить вручную</ThemedText>
           </Pressable>
         </View>
       </SafeAreaView>
