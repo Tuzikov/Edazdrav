@@ -43,7 +43,12 @@ export default function TodayScreen() {
                 Сегодня
               </ThemedText>
               <View style={styles.ringWrap}>
-                <CalorieRing consumed={totals.calories} goal={goals.calories} color="#3c87f7" trackColor="rgba(120,120,128,0.24)" />
+                <CalorieRing
+                  consumed={totals.calories}
+                  goal={goals.calories}
+                  color={totals.calories > goals.calories ? '#e5484d' : '#3c87f7'}
+                  trackColor="rgba(120,120,128,0.24)"
+                />
               </View>
               <View style={styles.macroGrid}>
                 <MacroCard label="Белки" consumed={totals.protein} goal={goals.protein} color="#3c87f7" />
