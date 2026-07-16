@@ -47,8 +47,12 @@ export async function recognizeMealPhoto(
   apiKey: string,
   model: string
 ): Promise<RecognizedIngredient[]> {
-  const prompt = `Look at this photo of a meal. Identify each distinct food item/ingredient visible on the plate and estimate its weight in grams based on typical portion sizes. Respond ONLY with a JSON array, no explanation, no markdown formatting, in this exact format:
-[{"name_ru": "название на русском", "name_search": "English USDA FoodData Central style search term including the visible preparation state, e.g. 'chicken breast, grilled' or 'banana, raw'", "grams": number}]`;
+  const prompt = `Look at this photo of a meal. Identify each distinct food item/ingredient/beverage visible and estimate its weight or volume in grams based on typical portion sizes (use ~1g per ml for drinks/water). Respond ONLY with a JSON array, no explanation, no markdown formatting, in this exact format:
+[{"name_ru": "название на русском", "name_search": "English USDA FoodData Central style search term", "grams": number}]
+
+Rules for name_search:
+- For solid foods (meat, vegetables, fruits, grains), include the preparation state the way USDA describes it, e.g. "chicken breast, grilled" or "banana, raw".
+- For beverages and liquids (water, coffee, tea, juice, milk, soda, alcohol), do NOT add "raw" or "cooked" — use the natural beverage name the way USDA describes it, e.g. "water, tap, drinking", "coffee with milk", "orange juice".`;
 
   const text = await callGemini(apiKey, model, [{ text: prompt }, { inline_data: { mime_type: mimeType, data: imageBase64 } }]);
   return parseJsonResponse(text) as RecognizedIngredient[];
@@ -57,9 +61,10 @@ export async function recognizeMealPhoto(
 // Для ручного ввода: у нас уже есть русское название от пользователя,
 // нужен только перевод для поиска в USDA.
 export async function translateIngredientName(nameRu: string, apiKey: string, model: string): Promise<string> {
-  const prompt = `Translate this Russian food/ingredient name to an English search term for USDA FoodData Central: "${nameRu}".
-Include the typical preparation state the way USDA describes foods (e.g. "raw" for fresh fruit/vegetables when the Russian name doesn't imply cooking, "grilled"/"boiled"/"fried" etc. when it does) — for example "banana, raw" or "chicken breast, grilled".
-Respond with ONLY the search term (2-4 words), nothing else.`;
+  const prompt = `Translate this Russian food/ingredient/beverage name to an English search term for USDA FoodData Central: "${nameRu}".
+- If it's a solid food (meat, vegetables, fruits, grains), include the typical preparation state the way USDA describes it (e.g. "raw" for fresh fruit/vegetables when the Russian name doesn't imply cooking, "grilled"/"boiled"/"fried" etc. when it does) — for example "banana, raw" or "chicken breast, grilled".
+- If it's a beverage or liquid (water, coffee, tea, juice, milk, soda, alcohol), do NOT add "raw"/"cooked" — use the natural beverage name the way USDA describes it, e.g. "water, tap, drinking" or "coffee with milk".
+Respond with ONLY the search term (2-5 words), nothing else.`;
 
   const text = await callGemini(apiKey, model, [{ text: prompt }]);
   return text.trim();

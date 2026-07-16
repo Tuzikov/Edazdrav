@@ -23,14 +23,15 @@ async function searchFoods(nameSearch: string, apiKey: string): Promise<any> {
   url.searchParams.set('dataType', DATA_TYPES);
   url.searchParams.set('pageSize', '1');
 
-  // USDA-эндпоинт периодически отдаёт 400 при частых запросах подряд —
-  // это не ошибка запроса, а нестабильность на их стороне, лечится ретраем.
-  const maxRetries = 2;
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+  // USDA-эндпоинт периодически отдаёт 400 сам по себе, без видимой причины
+  // на нашей стороне (не связано с частотой запросов) — лечится ретраем.
+  // 2 попытки было мало и иногда всё равно уходило в общий фолбэк.
+  const retryDelaysMs = [500, 1000, 2000, 4000];
+  for (let attempt = 0; attempt <= retryDelaysMs.length; attempt++) {
     const res = await fetch(url.toString());
     if (res.ok) return res.json();
-    if (attempt < maxRetries) {
-      await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+    if (attempt < retryDelaysMs.length) {
+      await new Promise((resolve) => setTimeout(resolve, retryDelaysMs[attempt]));
       continue;
     }
   }
