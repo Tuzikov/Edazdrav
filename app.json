@@ -41,7 +41,8 @@
           "photosPermission": "Приложению нужен доступ к галерее, чтобы выбрать фото блюда.",
           "cameraPermission": "Приложению нужен доступ к камере, чтобы сфотографировать блюдо."
         }
-      ]
+      ],
+      "react-native-edge-to-edge"
     ],
     "experiments": {
       "typedRoutes": true,
