@@ -7,11 +7,23 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDraftMeal } from '@/context/draft-meal-context';
-import { analyzeMealPhoto } from '@/lib/meal-analysis-api';
+import { analyzeMealPhoto, type AnalysisStage } from '@/lib/meal-analysis-api';
+
+const STAGE_LABELS: Record<AnalysisStage, string> = {
+  recognizing: 'Распознаём блюдо…',
+  calculating: 'Считаем калории…',
+};
 
 export default function AnalyzingScreen() {
   const { photo, setIngredients } = useDraftMeal();
   const [isRetrying, setIsRetrying] = useState(0);
+  const [stage, setStage] = useState<AnalysisStage>('recognizing');
+  const [syncedRetryToken, setSyncedRetryToken] = useState(isRetrying);
+
+  if (isRetrying !== syncedRetryToken) {
+    setSyncedRetryToken(isRetrying);
+    setStage('recognizing');
+  }
 
   useEffect(() => {
     if (!photo) {
@@ -21,7 +33,9 @@ export default function AnalyzingScreen() {
 
     let cancelled = false;
 
-    analyzeMealPhoto(photo.base64, photo.mimeType)
+    analyzeMealPhoto(photo.base64, photo.mimeType, (nextStage) => {
+      if (!cancelled) setStage(nextStage);
+    })
       .then((ingredients) => {
         if (cancelled) return;
         setIngredients(ingredients);
@@ -47,7 +61,7 @@ export default function AnalyzingScreen() {
       <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         {photo && <Image source={{ uri: photo.uri }} style={styles.photo} />}
         <ActivityIndicator size="large" color="#3c87f7" style={styles.spinner} />
-        <ThemedText type="default">Распознаём блюдо…</ThemedText>
+        <ThemedText type="default">{STAGE_LABELS[stage]}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           Это займёт несколько секунд
         </ThemedText>

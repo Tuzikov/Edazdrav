@@ -1,7 +1,9 @@
 import { corsHeaders } from '../_shared/cors.ts';
 import { recognizeMealPhoto } from '../_shared/gemini.ts';
-import { lookupNutrientsPer100g } from '../_shared/usda.ts';
 
+// Шаг 1 из 2: только распознавание фото через Gemini (name_ru + name_search +
+// граммы). Отдельная функция от lookup-nutrients, чтобы клиент мог показать
+// на экране, на каком именно шаге идёт запрос — это Gemini или USDA.
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -19,17 +21,8 @@ Deno.serve(async (req) => {
 
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY')!;
     const geminiModel = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
-    const fdcApiKey = Deno.env.get('FDC_API_KEY')!;
 
-    const recognized = await recognizeMealPhoto(imageBase64, mimeType || 'image/jpeg', geminiApiKey, geminiModel);
-
-    const ingredients = await Promise.all(
-      recognized.map(async (item) => ({
-        nameRu: item.name_ru,
-        grams: item.grams,
-        per100g: await lookupNutrientsPer100g(item.name_search, fdcApiKey),
-      }))
-    );
+    const ingredients = await recognizeMealPhoto(imageBase64, mimeType || 'image/jpeg', geminiApiKey, geminiModel);
 
     return new Response(JSON.stringify({ ingredients }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
