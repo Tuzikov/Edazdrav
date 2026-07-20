@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { Image, useColorScheme } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 
@@ -34,7 +34,14 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Профиль',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Image
+              source={require('../../../assets/images/profile-tab-icon.png')}
+              style={{ width: size, height: size }}
+              tintColor={color}
+              resizeMode="contain"
+            />
+          ),
         }}
       />
     </Tabs>
