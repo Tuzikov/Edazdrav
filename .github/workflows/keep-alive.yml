@@ -1,0 +1,18 @@
+name: Supabase keep-alive
+
+on:
+  schedule:
+    # Пн и Чт в 06:00 UTC — с запасом от 7-дневного порога Supabase.
+    - cron: '0 6 * * 1,4'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query keep_alive table
+        run: |
+          curl --fail --silent --show-error \
+            "https://iwqabjqsrqvmqciikzqn.supabase.co/rest/v1/keep_alive?select=id&limit=1" \
+            -H "apikey: sb_publishable_Y7eTtlq2SM0yk8kmzYPCyw_ttB4KuBE" \
+            -H "Authorization: Bearer sb_publishable_Y7eTtlq2SM0yk8kmzYPCyw_ttB4KuBE"
