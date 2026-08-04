@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDraftMeal } from '@/context/draft-meal-context';
+import { useTheme } from '@/hooks/use-theme';
 
 function mimeTypeFromAsset(asset: ImagePicker.ImagePickerAsset): string {
   if (asset.mimeType) return asset.mimeType;
@@ -15,6 +16,7 @@ function mimeTypeFromAsset(asset: ImagePicker.ImagePickerAsset): string {
 }
 
 export default function AddMealSourceScreen() {
+  const theme = useTheme();
   const { setPhoto, reset } = useDraftMeal();
 
   async function handlePhoto(source: 'camera' | 'library') {
@@ -55,15 +57,15 @@ export default function AddMealSourceScreen() {
         </ThemedText>
         <View style={styles.buttons}>
           <Pressable style={styles.optionButton} onPress={() => handlePhoto('camera')}>
-            <Ionicons name="camera-outline" size={32} color="#3c87f7" />
+            <Ionicons name="camera-outline" size={32} color={theme.accent} />
             <ThemedText type="smallBold">Сделать фото</ThemedText>
           </Pressable>
           <Pressable style={styles.optionButton} onPress={() => handlePhoto('library')}>
-            <Ionicons name="images-outline" size={32} color="#3c87f7" />
+            <Ionicons name="images-outline" size={32} color={theme.accent} />
             <ThemedText type="smallBold">Выбрать из галереи</ThemedText>
           </Pressable>
           <Pressable style={styles.optionButton} onPress={handleManualEntry}>
-            <Ionicons name="create-outline" size={32} color="#3c87f7" />
+            <Ionicons name="create-outline" size={32} color={theme.accent} />
             <ThemedText type="smallBold">Добавить вручную</ThemedText>
           </Pressable>
         </View>

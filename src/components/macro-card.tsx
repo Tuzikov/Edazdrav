@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 
 type Props = {
   label: string;
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export function MacroCard({ label, consumed, goal, unit = 'г', color }: Props) {
+  const theme = useTheme();
   const progress = goal > 0 ? Math.min(consumed / goal, 1) : 0;
 
   return (
@@ -21,7 +23,7 @@ export function MacroCard({ label, consumed, goal, unit = 'г', color }: Props) 
       <ThemedText type="small" themeColor="textSecondary">
         {Math.round(consumed)} / {Math.round(goal)} {unit}
       </ThemedText>
-      <View style={styles.track}>
+      <View style={[styles.track, { backgroundColor: `${theme.text}3D` }]}>
         <View style={[styles.fill, { width: `${progress * 100}%`, backgroundColor: color }]} />
       </View>
     </ThemedView>
@@ -31,14 +33,13 @@ export function MacroCard({ label, consumed, goal, unit = 'г', color }: Props) 
 const styles = StyleSheet.create({
   card: {
     flexBasis: '48%',
-    borderRadius: Spacing.three,
+    borderRadius: 20,
     padding: Spacing.three,
     gap: Spacing.two,
   },
   track: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(120,120,128,0.24)',
     overflow: 'hidden',
   },
   fill: {
