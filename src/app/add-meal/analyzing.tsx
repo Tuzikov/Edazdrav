@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDraftMeal } from '@/context/draft-meal-context';
+import { useTheme } from '@/hooks/use-theme';
 import { analyzeMealPhoto, type AnalysisStage } from '@/lib/meal-analysis-api';
 
 const STAGE_LABELS: Record<AnalysisStage, string> = {
@@ -15,6 +16,7 @@ const STAGE_LABELS: Record<AnalysisStage, string> = {
 };
 
 export default function AnalyzingScreen() {
+  const theme = useTheme();
   const { photo, setIngredients } = useDraftMeal();
   const [isRetrying, setIsRetrying] = useState(0);
   const [stage, setStage] = useState<AnalysisStage>('recognizing');
@@ -60,7 +62,7 @@ export default function AnalyzingScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         {photo && <Image source={{ uri: photo.uri }} style={styles.photo} />}
-        <ActivityIndicator size="large" color="#3c87f7" style={styles.spinner} />
+        <ActivityIndicator size="large" color={theme.accent} style={styles.spinner} />
         <ThemedText type="default">{STAGE_LABELS[stage]}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           Это займёт несколько секунд

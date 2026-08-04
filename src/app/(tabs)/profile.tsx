@@ -173,7 +173,11 @@ export default function ProfileScreen() {
             </View>
 
             <Pressable
-              style={[styles.calculateButton, !canCalculate && styles.saveButtonDisabled]}
+              style={[
+                styles.calculateButton,
+                { backgroundColor: theme.accentButton },
+                !canCalculate && styles.saveButtonDisabled,
+              ]}
               onPress={handleCalculate}
               disabled={!canCalculate}>
               <ThemedText type="smallBold" style={styles.saveButtonText}>
@@ -201,7 +205,10 @@ export default function ProfileScreen() {
             ))}
           </View>
           <Pressable
-            style={[styles.saveButton, !isDirty && styles.saveButtonSaved]}
+            style={[
+              styles.saveButton,
+              isDirty ? { backgroundColor: theme.accentButton } : styles.saveButtonSaved,
+            ]}
             onPress={handleSave}
             disabled={!isDirty}>
             <ThemedText type="smallBold" themeColor={isDirty ? undefined : 'textSecondary'} style={isDirty ? styles.saveButtonText : undefined}>
@@ -256,7 +263,6 @@ const styles = StyleSheet.create({
   radioDot: { width: 10, height: 10, borderRadius: 5 },
   activityText: { flex: 1 },
   calculateButton: {
-    backgroundColor: '#3c87f7',
     borderRadius: Spacing.two,
     paddingVertical: Spacing.three,
     alignItems: 'center',
@@ -274,7 +280,6 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: Spacing.four,
-    backgroundColor: '#3c87f7',
     borderRadius: Spacing.two,
     paddingVertical: Spacing.three,
     alignItems: 'center',

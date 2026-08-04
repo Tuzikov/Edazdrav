@@ -77,7 +77,7 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
             г
           </ThemedText>
           <Pressable onPress={() => onRemoveIngredient(item.id)} hitSlop={8}>
-            <Ionicons name="close-circle-outline" size={22} color="#999" />
+            <Ionicons name="close-circle-outline" size={22} color={theme.textSecondary} />
           </Pressable>
         </View>
       )}
@@ -105,9 +105,12 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
                 editable={!isLookingUp}
                 onSubmitEditing={handleAddIngredient}
               />
-              <Pressable onPress={handleAddIngredient} style={styles.addConfirm} disabled={isLookingUp}>
+              <Pressable
+                onPress={handleAddIngredient}
+                style={[styles.addConfirm, { backgroundColor: theme.accentButton }]}
+                disabled={isLookingUp}>
                 {isLookingUp ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={theme.onAccent} />
                 ) : (
                   <ThemedText type="smallBold" style={styles.addConfirmText}>
                     Добавить
@@ -117,7 +120,7 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
             </View>
           ) : (
             <Pressable style={styles.addIngredientButton} onPress={() => setIsAdding(true)}>
-              <Ionicons name="add-circle-outline" size={20} color="#3c87f7" />
+              <Ionicons name="add-circle-outline" size={20} color={theme.accent} />
               <ThemedText type="smallBold">Добавить ингредиент</ThemedText>
             </Pressable>
           )}
@@ -204,7 +207,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   addConfirm: {
-    backgroundColor: '#3c87f7',
     borderRadius: Spacing.two,
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,

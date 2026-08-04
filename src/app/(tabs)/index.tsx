@@ -12,6 +12,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useMeals } from '@/context/meals-context';
 import { useProfile } from '@/context/profile-context';
+import { useTheme } from '@/hooks/use-theme';
 import { sumIngredients } from '@/lib/nutrition';
 
 function isToday(iso: string) {
@@ -21,6 +22,7 @@ function isToday(iso: string) {
 export default function TodayScreen() {
   const { goals } = useProfile();
   const { meals } = useMeals();
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
 
   const todaysMeals = useMemo(() => meals.filter((meal) => isToday(meal.createdAt)), [meals]);
@@ -46,15 +48,15 @@ export default function TodayScreen() {
                 <CalorieRing
                   consumed={totals.calories}
                   goal={goals.calories}
-                  color={totals.calories > goals.calories ? '#e5484d' : '#3c87f7'}
-                  trackColor="rgba(120,120,128,0.24)"
+                  color={totals.calories > goals.calories ? theme.danger : theme.accent}
+                  trackColor={`${theme.text}48`}
                 />
               </View>
               <View style={styles.macroGrid}>
-                <MacroCard label="Белки" consumed={totals.protein} goal={goals.protein} color="#3c87f7" />
-                <MacroCard label="Жиры" consumed={totals.fat} goal={goals.fat} color="#f7a23c" />
-                <MacroCard label="Углеводы" consumed={totals.carbs} goal={goals.carbs} color="#3cc26a" />
-                <MacroCard label="Клетчатка" consumed={totals.fiber} goal={goals.fiber} color="#a23cf7" />
+                <MacroCard label="Белки" consumed={totals.protein} goal={goals.protein} color={theme.nutrientProtein} />
+                <MacroCard label="Жиры" consumed={totals.fat} goal={goals.fat} color={theme.nutrientFat} />
+                <MacroCard label="Углеводы" consumed={totals.carbs} goal={goals.carbs} color={theme.nutrientCarbs} />
+                <MacroCard label="Клетчатка" consumed={totals.fiber} goal={goals.fiber} color={theme.nutrientFiber} />
               </View>
               <ThemedText type="smallBold" style={styles.sectionTitle}>
                 Приёмы пищи
@@ -68,8 +70,8 @@ export default function TodayScreen() {
             </ThemedText>
           }
         />
-        <Pressable style={styles.fab} onPress={() => router.push('/add-meal')}>
-          <Ionicons name="camera" size={28} color="#fff" />
+        <Pressable style={[styles.fab, { backgroundColor: theme.accent }]} onPress={() => router.push('/add-meal')}>
+          <Ionicons name="camera" size={28} color={theme.onAccent} />
         </Pressable>
       </View>
     </ThemedView>
@@ -93,13 +95,9 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#3c87f7',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
     elevation: 4,
   },
 });
