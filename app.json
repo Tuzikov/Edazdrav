@@ -42,7 +42,18 @@
           "cameraPermission": "Приложению нужен доступ к камере, чтобы сфотографировать блюдо."
         }
       ],
-      "react-native-edge-to-edge"
+      "react-native-edge-to-edge",
+      "react-native-health-connect",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "minSdkVersion": 26
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

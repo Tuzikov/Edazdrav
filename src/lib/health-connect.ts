@@ -1,0 +1,104 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+import {
+  deleteRecordsByUuids,
+  getSdkStatus,
+  initialize,
+  insertRecords,
+  MealType,
+  openHealthConnectSettings,
+  requestPermission,
+  SdkAvailabilityStatus,
+} from 'react-native-health-connect';
+
+import type { Meal } from '@/context/meals-context';
+
+const NUTRITION_WRITE_PERMISSION = { accessType: 'write', recordType: 'Nutrition' } as const;
+const ENABLED_STORAGE_KEY = 'edazdrav.healthConnect.enabled';
+
+export const isHealthConnectSupported = Platform.OS === 'android';
+
+export async function getHealthConnectSyncEnabled(): Promise<boolean> {
+  if (!isHealthConnectSupported) return false;
+  const raw = await AsyncStorage.getItem(ENABLED_STORAGE_KEY);
+  return raw === 'true';
+}
+
+export function disableHealthConnectSync(): Promise<void> {
+  return AsyncStorage.setItem(ENABLED_STORAGE_KEY, 'false');
+}
+
+export type EnableResult =
+  | { ok: true }
+  | { ok: false; reason: 'unsupported' | 'not-installed' | 'update-required' | 'permission-denied' };
+
+export async function enableHealthConnectSync(): Promise<EnableResult> {
+  if (!isHealthConnectSupported) return { ok: false, reason: 'unsupported' };
+
+  const status = await getSdkStatus();
+  if (status === SdkAvailabilityStatus.SDK_UNAVAILABLE) return { ok: false, reason: 'not-installed' };
+  if (status === SdkAvailabilityStatus.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED) {
+    return { ok: false, reason: 'update-required' };
+  }
+
+  const initialized = await initialize();
+  if (!initialized) return { ok: false, reason: 'not-installed' };
+
+  const granted = await requestPermission([NUTRITION_WRITE_PERMISSION]);
+  const hasPermission = granted.some(
+    (permission) => permission.recordType === 'Nutrition' && permission.accessType === 'write'
+  );
+  if (!hasPermission) return { ok: false, reason: 'permission-denied' };
+
+  await AsyncStorage.setItem(ENABLED_STORAGE_KEY, 'true');
+  return { ok: true };
+}
+
+export function openHealthConnectApp() {
+  if (!isHealthConnectSupported) return;
+  openHealthConnectSettings();
+}
+
+function inferMealType(iso: string): number {
+  const hour = new Date(iso).getHours();
+  if (hour < 11) return MealType.BREAKFAST;
+  if (hour < 16) return MealType.LUNCH;
+  if (hour < 21) return MealType.DINNER;
+  return MealType.SNACK;
+}
+
+// Лучшая попытка синхронизации — ошибки не должны ломать сохранение приёма пищи
+// в самом приложении, поэтому все проблемы просто проглатываются здесь.
+export async function syncMealToHealthConnect(meal: Meal): Promise<string | null> {
+  if (!(await getHealthConnectSyncEnabled())) return null;
+
+  try {
+    const name = meal.ingredients.map((ingredient) => ingredient.nameRu).join(', ') || 'Приём пищи';
+    const [recordId] = await insertRecords([
+      {
+        recordType: 'Nutrition',
+        startTime: meal.createdAt,
+        endTime: meal.createdAt,
+        energy: { value: meal.totals.calories, unit: 'kilocalories' },
+        protein: { value: meal.totals.protein, unit: 'grams' },
+        totalFat: { value: meal.totals.fat, unit: 'grams' },
+        totalCarbohydrate: { value: meal.totals.carbs, unit: 'grams' },
+        dietaryFiber: { value: meal.totals.fiber, unit: 'grams' },
+        name,
+        mealType: inferMealType(meal.createdAt),
+      },
+    ]);
+    return recordId ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteMealFromHealthConnect(recordId: string): Promise<void> {
+  if (!isHealthConnectSupported) return;
+  try {
+    await deleteRecordsByUuids('Nutrition', [recordId], []);
+  } catch {
+    // не получилось удалить старую запись — оставляем как есть, не блокируем редактирование
+  }
+}
