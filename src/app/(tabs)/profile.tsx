@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useProfile, type NutritionGoals } from '@/context/profile-context';
+import { useThemePreference, type ThemePreference } from '@/context/theme-preference-context';
 import { useTheme } from '@/hooks/use-theme';
 import { ACTIVITY_LEVELS, calculateGoals, type ActivityLevel, type Sex } from '@/lib/goal-calculator';
 import {
@@ -18,6 +19,12 @@ import {
 } from '@/lib/health-connect';
 
 const HEALTH_CONNECT_PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata';
+
+const THEME_OPTIONS: { key: ThemePreference; label: string }[] = [
+  { key: 'system', label: 'Системная' },
+  { key: 'light', label: 'Светлая' },
+  { key: 'dark', label: 'Тёмная' },
+];
 
 const SYNC_ERROR_MESSAGES: Record<Exclude<EnableResult, { ok: true }>['reason'], string> = {
   unsupported: 'Доступно только на Android.',
@@ -40,6 +47,7 @@ function stringifyGoals(goals: NutritionGoals): Record<string, string> {
 
 export default function ProfileScreen() {
   const { goals, updateGoals } = useProfile();
+  const { preference: themePreference, setPreference: setThemePreference } = useThemePreference();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [draft, setDraft] = useState<Record<string, string>>(() => stringifyGoals(goals));
@@ -259,6 +267,29 @@ export default function ProfileScreen() {
               {isDirty ? 'Сохранить' : 'Сохранено'}
             </ThemedText>
           </Pressable>
+
+          <ThemedView type="backgroundElement" style={styles.healthCard}>
+            <ThemedText type="smallBold">Тема</ThemedText>
+            <View style={styles.sexRow}>
+              {THEME_OPTIONS.map((option) => {
+                const selected = themePreference === option.key;
+                return (
+                  <Pressable
+                    key={option.key}
+                    onPress={() => setThemePreference(option.key)}
+                    style={[
+                      styles.pill,
+                      { borderColor: theme.textSecondary },
+                      selected && { backgroundColor: theme.text, borderColor: theme.text },
+                    ]}>
+                    <ThemedText type="small" style={selected ? { color: theme.background } : undefined}>
+                      {option.label}
+                    </ThemedText>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </ThemedView>
 
           {isHealthConnectSupported && (
             <ThemedView type="backgroundElement" style={styles.healthCard}>
