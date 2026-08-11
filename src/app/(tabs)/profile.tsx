@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Linking, Pressable, ScrollView, StyleSheet, Switch, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -8,6 +8,23 @@ import { Spacing } from '@/constants/theme';
 import { useProfile, type NutritionGoals } from '@/context/profile-context';
 import { useTheme } from '@/hooks/use-theme';
 import { ACTIVITY_LEVELS, calculateGoals, type ActivityLevel, type Sex } from '@/lib/goal-calculator';
+import {
+  disableHealthConnectSync,
+  enableHealthConnectSync,
+  getHealthConnectSyncEnabled,
+  isHealthConnectSupported,
+  openHealthConnectApp,
+  type EnableResult,
+} from '@/lib/health-connect';
+
+const HEALTH_CONNECT_PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata';
+
+const SYNC_ERROR_MESSAGES: Record<Exclude<EnableResult, { ok: true }>['reason'], string> = {
+  unsupported: 'Доступно только на Android.',
+  'not-installed': 'Приложение Health Connect не установлено.',
+  'update-required': 'Health Connect нужно обновить в Google Play.',
+  'permission-denied': 'Не удалось получить разрешение на запись данных.',
+};
 
 const FIELDS: { key: keyof NutritionGoals; label: string; unit: string }[] = [
   { key: 'calories', label: 'Калории', unit: 'ккал/день' },
@@ -33,6 +50,33 @@ export default function ProfileScreen() {
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [activity, setActivity] = useState<ActivityLevel>('sedentary');
+
+  const [healthSyncEnabled, setHealthSyncEnabled] = useState(false);
+  const [healthSyncBusy, setHealthSyncBusy] = useState(false);
+  const [healthSyncError, setHealthSyncError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getHealthConnectSyncEnabled().then(setHealthSyncEnabled);
+  }, []);
+
+  async function handleToggleHealthSync(next: boolean) {
+    setHealthSyncError(null);
+    if (!next) {
+      await disableHealthConnectSync();
+      setHealthSyncEnabled(false);
+      return;
+    }
+
+    setHealthSyncBusy(true);
+    const result = await enableHealthConnectSync();
+    setHealthSyncBusy(false);
+    if (result.ok) {
+      setHealthSyncEnabled(true);
+    } else {
+      setHealthSyncEnabled(false);
+      setHealthSyncError(SYNC_ERROR_MESSAGES[result.reason]);
+    }
+  }
 
   if (goals !== syncedGoals) {
     setSyncedGoals(goals);
@@ -208,6 +252,45 @@ export default function ProfileScreen() {
               {isDirty ? 'Сохранить' : 'Сохранено'}
             </ThemedText>
           </Pressable>
+
+          {isHealthConnectSupported && (
+            <ThemedView type="backgroundElement" style={styles.healthCard}>
+              <View style={styles.healthRow}>
+                <View style={styles.healthText}>
+                  <ThemedText type="smallBold">Синхронизация с Health Connect</ThemedText>
+                  <ThemedText type="small" themeColor="textSecondary">
+                    Калории и БЖУ каждого приёма пищи будут записываться в Health Connect.
+                  </ThemedText>
+                </View>
+                <Switch
+                  value={healthSyncEnabled}
+                  onValueChange={handleToggleHealthSync}
+                  disabled={healthSyncBusy}
+                  trackColor={{ false: `${theme.text}3D`, true: theme.text }}
+                  thumbColor={theme.background}
+                />
+              </View>
+              {healthSyncError && (
+                <View style={styles.healthErrorBlock}>
+                  <ThemedText type="small" style={{ color: '#e5484d' }}>
+                    {healthSyncError}
+                  </ThemedText>
+                  <Pressable
+                    onPress={() =>
+                      healthSyncError === SYNC_ERROR_MESSAGES['permission-denied']
+                        ? openHealthConnectApp()
+                        : Linking.openURL(HEALTH_CONNECT_PLAY_STORE_URL)
+                    }>
+                    <ThemedText type="linkPrimary">
+                      {healthSyncError === SYNC_ERROR_MESSAGES['permission-denied']
+                        ? 'Открыть настройки Health Connect'
+                        : 'Открыть Google Play'}
+                    </ThemedText>
+                  </Pressable>
+                </View>
+              )}
+            </ThemedView>
+          )}
         </ScrollView>
       </View>
     </ThemedView>
@@ -282,4 +365,13 @@ const styles = StyleSheet.create({
   saveButtonDisabled: { opacity: 0.5 },
   saveButtonSaved: { backgroundColor: 'rgba(120,120,128,0.24)' },
   saveButtonText: { color: '#fff' },
+  healthCard: {
+    marginTop: Spacing.four,
+    borderRadius: 20,
+    padding: Spacing.three,
+    gap: Spacing.two,
+  },
+  healthRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
+  healthText: { flex: 1, gap: 2 },
+  healthErrorBlock: { gap: Spacing.one },
 });

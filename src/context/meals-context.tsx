@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
+import { deleteMealFromHealthConnect, syncMealToHealthConnect } from '@/lib/health-connect';
 import { sumIngredients, type Ingredient, type NutrientTotals } from '@/lib/nutrition';
 
 export type Meal = {
@@ -9,6 +10,8 @@ export type Meal = {
   ingredients: Ingredient[];
   totals: NutrientTotals;
   createdAt: string;
+  /** id записи в Health Connect, если приём пищи туда синхронизирован */
+  healthRecordId?: string;
 };
 
 const STORAGE_KEY = 'edazdrav.meals';
@@ -39,6 +42,19 @@ export function MealsProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  function persist(next: Meal[]) {
+    setMeals(next);
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  }
+
+  function attachHealthRecordId(mealId: string, healthRecordId: string) {
+    setMeals((prev) => {
+      const next = prev.map((meal) => (meal.id === mealId ? { ...meal, healthRecordId } : meal));
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
+
   function addMeal(photoUri: string | null, ingredients: Ingredient[]) {
     const meal: Meal = {
       id: `meal-${Date.now()}`,
@@ -47,15 +63,26 @@ export function MealsProvider({ children }: { children: ReactNode }) {
       totals: sumIngredients(ingredients),
       createdAt: new Date().toISOString(),
     };
-    const next = [meal, ...meals];
-    setMeals(next);
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    persist([meal, ...meals]);
+
+    syncMealToHealthConnect(meal).then((healthRecordId) => {
+      if (healthRecordId) attachHealthRecordId(meal.id, healthRecordId);
+    });
   }
 
   function updateMeal(id: string, ingredients: Ingredient[]) {
+    const existing = meals.find((meal) => meal.id === id);
     const next = meals.map((meal) => (meal.id === id ? { ...meal, ingredients, totals: sumIngredients(ingredients) } : meal));
-    setMeals(next);
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    persist(next);
+
+    const updated = next.find((meal) => meal.id === id);
+    if (!updated) return;
+
+    (existing?.healthRecordId ? deleteMealFromHealthConnect(existing.healthRecordId) : Promise.resolve())
+      .then(() => syncMealToHealthConnect(updated))
+      .then((healthRecordId) => {
+        if (healthRecordId) attachHealthRecordId(id, healthRecordId);
+      });
   }
 
   return <MealsContext.Provider value={{ meals, isLoaded, addMeal, updateMeal }}>{children}</MealsContext.Provider>;
