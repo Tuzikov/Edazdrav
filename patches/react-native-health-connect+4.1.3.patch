@@ -1,0 +1,19 @@
+diff --git a/node_modules/react-native-health-connect/android/src/main/java/dev/matinzd/healthconnect/HealthConnectManager.kt b/node_modules/react-native-health-connect/android/src/main/java/dev/matinzd/healthconnect/HealthConnectManager.kt
+index 40539fe..7578ddf 100644
+--- a/node_modules/react-native-health-connect/android/src/main/java/dev/matinzd/healthconnect/HealthConnectManager.kt
++++ b/node_modules/react-native-health-connect/android/src/main/java/dev/matinzd/healthconnect/HealthConnectManager.kt
+@@ -69,8 +69,12 @@ class HealthConnectManager(private val applicationContext: ReactApplicationConte
+   ) {
+     throwUnlessClientIsAvailable(promise) {
+       coroutineScope.launch {
+-        val granted = HealthConnectPermissionDelegate.launchPermissionsDialog(PermissionUtils.parsePermissions(reactPermissions))
+-        promise.resolve(PermissionUtils.mapPermissionResult(granted))
++        try {
++          val granted = HealthConnectPermissionDelegate.launchPermissionsDialog(PermissionUtils.parsePermissions(reactPermissions))
++          promise.resolve(PermissionUtils.mapPermissionResult(granted))
++        } catch (e: Exception) {
++          promise.rejectWithException(e)
++        }
+       }
+     }
+   }
