@@ -30,7 +30,11 @@ export function disableHealthConnectSync(): Promise<void> {
 
 export type EnableResult =
   | { ok: true }
-  | { ok: false; reason: 'unsupported' | 'not-installed' | 'update-required' | 'permission-denied' };
+  | {
+      ok: false;
+      reason: 'unsupported' | 'not-installed' | 'update-required' | 'permission-denied' | 'error';
+      message?: string;
+    };
 
 export async function enableHealthConnectSync(): Promise<EnableResult> {
   if (!isHealthConnectSupported) return { ok: false, reason: 'unsupported' };
@@ -44,7 +48,13 @@ export async function enableHealthConnectSync(): Promise<EnableResult> {
   const initialized = await initialize();
   if (!initialized) return { ok: false, reason: 'not-installed' };
 
-  const granted = await requestPermission([NUTRITION_WRITE_PERMISSION]);
+  let granted: Awaited<ReturnType<typeof requestPermission>>;
+  try {
+    granted = await requestPermission([NUTRITION_WRITE_PERMISSION]);
+  } catch (e) {
+    return { ok: false, reason: 'error', message: e instanceof Error ? e.message : String(e) };
+  }
+
   const hasPermission = granted.some(
     (permission) => permission.recordType === 'Nutrition' && permission.accessType === 'write'
   );

@@ -31,6 +31,7 @@ const SYNC_ERROR_MESSAGES: Record<Exclude<EnableResult, { ok: true }>['reason'],
   'not-installed': 'Приложение Health Connect не установлено.',
   'update-required': 'Health Connect нужно обновить в Google Play.',
   'permission-denied': 'Не удалось получить разрешение на запись данных.',
+  error: 'Не удалось подключиться к Health Connect.',
 };
 
 const FIELDS: { key: keyof NutritionGoals; label: string; unit: string }[] = [
@@ -82,7 +83,8 @@ export default function ProfileScreen() {
       setHealthSyncEnabled(true);
     } else {
       setHealthSyncEnabled(false);
-      setHealthSyncError(SYNC_ERROR_MESSAGES[result.reason]);
+      const base = SYNC_ERROR_MESSAGES[result.reason];
+      setHealthSyncError(result.reason === 'error' && result.message ? `${base} (${result.message})` : base);
     }
   }
 
