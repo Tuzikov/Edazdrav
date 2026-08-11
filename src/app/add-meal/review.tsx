@@ -8,8 +8,10 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDraftMeal } from '@/context/draft-meal-context';
 import { useMeals } from '@/context/meals-context';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function ReviewScreen() {
+  const theme = useTheme();
   const { photoUri, ingredients, updateIngredientGrams, removeIngredient, addIngredient, reset } = useDraftMeal();
   const { addMeal } = useMeals();
 
@@ -30,7 +32,11 @@ export default function ReviewScreen() {
           onAddIngredient={addIngredient}
           footer={
             <Pressable
-              style={[styles.saveButton, ingredients.length === 0 && styles.saveButtonDisabled]}
+              style={[
+                styles.saveButton,
+                { backgroundColor: theme.accentButton },
+                ingredients.length === 0 && styles.saveButtonDisabled,
+              ]}
               onPress={handleSave}
               disabled={ingredients.length === 0}>
               <ThemedText type="smallBold" style={styles.saveButtonText}>
@@ -49,7 +55,6 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   saveButton: {
     marginTop: Spacing.three,
-    backgroundColor: '#3c87f7',
     borderRadius: Spacing.three,
     paddingVertical: Spacing.three,
     alignItems: 'center',

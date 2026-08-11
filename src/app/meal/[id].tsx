@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useMeals } from '@/context/meals-context';
+import { useTheme } from '@/hooks/use-theme';
 import type { Ingredient } from '@/lib/nutrition';
 
 function formatDateTime(iso: string) {
@@ -15,6 +16,7 @@ function formatDateTime(iso: string) {
 }
 
 export default function MealDetailScreen() {
+  const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { meals, updateMeal } = useMeals();
   const meal = meals.find((item) => item.id === id);
@@ -64,7 +66,11 @@ export default function MealDetailScreen() {
           onAddIngredient={addIngredient}
           footer={
             <Pressable
-              style={[styles.saveButton, ingredients.length === 0 && styles.saveButtonDisabled]}
+              style={[
+                styles.saveButton,
+                { backgroundColor: theme.accentButton },
+                ingredients.length === 0 && styles.saveButtonDisabled,
+              ]}
               onPress={handleSave}
               disabled={ingredients.length === 0}>
               <ThemedText type="smallBold" style={styles.saveButtonText}>
@@ -84,7 +90,6 @@ const styles = StyleSheet.create({
   notFound: { padding: Spacing.four, textAlign: 'center' },
   saveButton: {
     marginTop: Spacing.three,
-    backgroundColor: '#3c87f7',
     borderRadius: Spacing.three,
     paddingVertical: Spacing.three,
     alignItems: 'center',
