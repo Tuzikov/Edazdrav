@@ -13,6 +13,7 @@ import {
   disableHealthConnectSync,
   enableHealthConnectSync,
   getHealthConnectSyncEnabled,
+  getLastSyncError,
   isHealthConnectSupported,
   openHealthConnectApp,
   type EnableResult,
@@ -63,9 +64,11 @@ export default function ProfileScreen() {
   const [healthSyncEnabled, setHealthSyncEnabled] = useState(false);
   const [healthSyncBusy, setHealthSyncBusy] = useState(false);
   const [healthSyncError, setHealthSyncError] = useState<string | null>(null);
+  const [lastMealSyncError, setLastMealSyncError] = useState<string | null>(null);
 
   useEffect(() => {
     getHealthConnectSyncEnabled().then(setHealthSyncEnabled);
+    getLastSyncError().then(setLastMealSyncError);
   }, []);
 
   async function handleToggleHealthSync(next: boolean) {
@@ -327,6 +330,16 @@ export default function ProfileScreen() {
                         : 'Открыть Google Play'}
                     </ThemedText>
                   </Pressable>
+                </View>
+              )}
+              {lastMealSyncError && (
+                <View style={styles.healthErrorBlock}>
+                  <ThemedText type="small" themeColor="textSecondary">
+                    Последняя попытка записать приём пищи не удалась:
+                  </ThemedText>
+                  <ThemedText type="small" style={{ color: '#e5484d' }}>
+                    {lastMealSyncError}
+                  </ThemedText>
                 </View>
               )}
             </ThemedView>
