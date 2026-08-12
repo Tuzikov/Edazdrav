@@ -15,8 +15,14 @@ import type { Meal } from '@/context/meals-context';
 
 const NUTRITION_WRITE_PERMISSION = { accessType: 'write', recordType: 'Nutrition' } as const;
 const ENABLED_STORAGE_KEY = 'edazdrav.healthConnect.enabled';
+const LAST_SYNC_ERROR_KEY = 'edazdrav.healthConnect.lastSyncError';
 
 export const isHealthConnectSupported = Platform.OS === 'android';
+
+export async function getLastSyncError(): Promise<string | null> {
+  if (!isHealthConnectSupported) return null;
+  return AsyncStorage.getItem(LAST_SYNC_ERROR_KEY);
+}
 
 export async function getHealthConnectSyncEnabled(): Promise<boolean> {
   if (!isHealthConnectSupported) return false;
@@ -78,7 +84,8 @@ function inferMealType(iso: string): number {
 }
 
 // Лучшая попытка синхронизации — ошибки не должны ломать сохранение приёма пищи
-// в самом приложении, поэтому все проблемы просто проглатываются здесь.
+// в самом приложении, поэтому промис всегда разрешается, а не отклоняется.
+// Реальная причина сбоя (если был) сохраняется отдельно — см. getLastSyncError().
 export async function syncMealToHealthConnect(meal: Meal): Promise<string | null> {
   if (!(await getHealthConnectSyncEnabled())) return null;
 
@@ -98,8 +105,10 @@ export async function syncMealToHealthConnect(meal: Meal): Promise<string | null
         mealType: inferMealType(meal.createdAt),
       },
     ]);
+    await AsyncStorage.removeItem(LAST_SYNC_ERROR_KEY);
     return recordId ?? null;
-  } catch {
+  } catch (e) {
+    await AsyncStorage.setItem(LAST_SYNC_ERROR_KEY, e instanceof Error ? e.message : String(e));
     return null;
   }
 }
