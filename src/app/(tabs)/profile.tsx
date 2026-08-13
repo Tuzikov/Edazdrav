@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -66,10 +67,12 @@ export default function ProfileScreen() {
   const [healthSyncError, setHealthSyncError] = useState<string | null>(null);
   const [lastMealSyncError, setLastMealSyncError] = useState<string | null>(null);
 
-  useEffect(() => {
-    getHealthConnectSyncEnabled().then(setHealthSyncEnabled);
-    getLastSyncError().then(setLastMealSyncError);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getHealthConnectSyncEnabled().then(setHealthSyncEnabled);
+      getLastSyncError().then(setLastMealSyncError);
+    }, [])
+  );
 
   async function handleToggleHealthSync(next: boolean) {
     setHealthSyncError(null);
