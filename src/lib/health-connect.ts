@@ -91,11 +91,14 @@ export async function syncMealToHealthConnect(meal: Meal): Promise<string | null
 
   try {
     const name = meal.ingredients.map((ingredient) => ingredient.nameRu).join(', ') || 'Приём пищи';
+    // Nutrition — это IntervalRecord: Health Connect требует startTime < endTime,
+    // а приём пищи в приложении — мгновенное событие, поэтому просто берём минуту.
+    const endTime = new Date(new Date(meal.createdAt).getTime() + 60_000).toISOString();
     const [recordId] = await insertRecords([
       {
         recordType: 'Nutrition',
         startTime: meal.createdAt,
-        endTime: meal.createdAt,
+        endTime,
         energy: { value: meal.totals.calories, unit: 'kilocalories' },
         protein: { value: meal.totals.protein, unit: 'grams' },
         totalFat: { value: meal.totals.fat, unit: 'grams' },
