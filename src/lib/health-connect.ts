@@ -42,6 +42,19 @@ export type EnableResult =
       message?: string;
     };
 
+// Нативный healthConnectClient живёт только в рамках текущего процесса
+// приложения — после перезапуска (или если приложение выгрузили из памяти)
+// он снова не инициализирован, даже если разрешение уже выдано и тумблер
+// включён. initialize() достаточно дёшев, чтобы просто звать перед каждой
+// операцией, а не полагаться на то, что он уже был вызван при включении тумблера.
+async function ensureInitialized(): Promise<boolean> {
+  try {
+    return await initialize();
+  } catch {
+    return false;
+  }
+}
+
 export async function enableHealthConnectSync(): Promise<EnableResult> {
   if (!isHealthConnectSupported) return { ok: false, reason: 'unsupported' };
 
@@ -51,8 +64,7 @@ export async function enableHealthConnectSync(): Promise<EnableResult> {
     return { ok: false, reason: 'update-required' };
   }
 
-  const initialized = await initialize();
-  if (!initialized) return { ok: false, reason: 'not-installed' };
+  if (!(await ensureInitialized())) return { ok: false, reason: 'not-installed' };
 
   let granted: Awaited<ReturnType<typeof requestPermission>>;
   try {
@@ -90,6 +102,11 @@ export async function syncMealToHealthConnect(meal: Meal): Promise<string | null
   if (!(await getHealthConnectSyncEnabled())) return null;
 
   try {
+    if (!(await ensureInitialized())) {
+      await AsyncStorage.setItem(LAST_SYNC_ERROR_KEY, 'Health Connect client is not initialized');
+      return null;
+    }
+
     const name = meal.ingredients.map((ingredient) => ingredient.nameRu).join(', ') || 'Приём пищи';
     // Nutrition — это IntervalRecord: Health Connect требует startTime < endTime,
     // а приём пищи в приложении — мгновенное событие, поэтому просто берём минуту.
@@ -119,6 +136,7 @@ export async function syncMealToHealthConnect(meal: Meal): Promise<string | null
 export async function deleteMealFromHealthConnect(recordId: string): Promise<void> {
   if (!isHealthConnectSupported) return;
   try {
+    if (!(await ensureInitialized())) return;
     await deleteRecordsByUuids('Nutrition', [recordId], []);
   } catch {
     // не получилось удалить старую запись — оставляем как есть, не блокируем редактирование
