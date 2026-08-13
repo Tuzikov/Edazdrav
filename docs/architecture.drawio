@@ -1,170 +1,201 @@
 <mxfile host="app.diagrams.net" agent="Claude Code" version="24.7.5">
   <diagram name="Архитектура" id="edazdrav-architecture">
-    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="950" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="Edazdrav (Едазавр) — архитектура проекта" style="text;html=1;fontSize=22;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="40" y="10" width="700" height="30" as="geometry" />
+        <mxCell id="title" value="Едазавр (Edazdrav) — архитектура проекта" style="text;html=1;fontSize=24;fontStyle=1;fontFamily=Helvetica;fontColor=#1A1A2E;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="8" width="700" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="titleAccent" value="" style="rounded=1;arcSize=100;whiteSpace=wrap;html=1;fillColor=#F3680F;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="44" width="60" height="5" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Счётчик калорий по фото — React Native / Expo (Android) + Supabase Edge Functions" style="text;html=1;fontSize=12;fontFamily=Helvetica;fontColor=#5C6773;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="52" width="700" height="20" as="geometry" />
         </mxCell>
 
         <!-- User -->
-        <mxCell id="user" value="Пользователь&lt;br&gt;Android-телефон (Expo Go при разработке / установленный APK)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="60" y="60" width="300" height="55" as="geometry" />
+        <mxCell id="user" value="Пользователь&lt;br&gt;Android-телефон (Expo Go при разработке / установленный APK)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#F8F9FA;strokeColor=#868E96;strokeWidth=1.5;fontSize=12;fontFamily=Helvetica;fontColor=#343A40;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="300" height="55" as="geometry" />
         </mxCell>
 
         <!-- Container 1: Client -->
-        <mxCell id="container1" value="Клиент — Expo / React Native (Android)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#6c8ebf;verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;fontStyle=1;fontSize=13;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="40" y="140" width="340" height="490" as="geometry" />
+        <mxCell id="container1" value="КЛИЕНТ — Expo / React Native (Android)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#F5F7FF;strokeColor=#4C6EF5;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontStyle=1;fontSize=12;fontFamily=Helvetica;fontColor=#3B5BDB;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="170" width="340" height="560" as="geometry" />
         </mxCell>
 
-        <mxCell id="n1" value="Экран «Сегодня»&lt;br&gt;кольцо калорий, карточки БЖУ, список приёмов (тап → детали)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="190" width="300" height="50" as="geometry" />
+        <mxCell id="n1" value="Экран «Сегодня»&lt;br&gt;кольцо калорий, карточки БЖУ, список приёмов (тап → детали)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E7EBFF;strokeColor=#4C6EF5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="220" width="300" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="n2" value="Экран «История»&lt;br&gt;сумма по дню + выбор метрики (Б/Ж/У/клетчатка)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="250" width="300" height="50" as="geometry" />
+        <mxCell id="n2" value="Экран «История»&lt;br&gt;сумма по дню + выбор метрики (Б/Ж/У/клетчатка)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E7EBFF;strokeColor=#4C6EF5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="280" width="300" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="n3" value="Экран «Профиль»&lt;br&gt;ручные цели + калькулятор (пол/возраст/вес/рост/активность)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="310" width="300" height="55" as="geometry" />
+        <mxCell id="n3" value="Экран «Профиль»&lt;br&gt;ручные цели + калькулятор; тумблер темы (Системная/Светлая/Тёмная); тумблер синхронизации с Health Connect" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E7EBFF;strokeColor=#4C6EF5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="340" width="300" height="65" as="geometry" />
         </mxCell>
-        <mxCell id="n4" value="Flow добавления/редактирования блюда (MealEditor)&lt;br&gt;Камера / Галерея / «Добавить вручную» → «Анализ» (статус: Распознаём блюдо… → Считаем калории…) → «Приём пищи» (сохранение); тот же экран открывается для правки уже сохранённых приёмов" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="375" width="300" height="65" as="geometry" />
+        <mxCell id="n4" value="Flow добавления/редактирования блюда (MealEditor)&lt;br&gt;Камера / Галерея / «Добавить вручную» → «Анализ» (статус: Распознаём блюдо… → Считаем калории…) → «Приём пищи» (сохранение); тот же экран открывается для правки уже сохранённых приёмов" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E7EBFF;strokeColor=#4C6EF5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="415" width="300" height="65" as="geometry" />
         </mxCell>
-        <mxCell id="n5" value="ProfileContext / MealsContext&lt;br&gt;локальное хранение (AsyncStorage, на устройстве)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="450" width="300" height="50" as="geometry" />
+        <mxCell id="n5" value="ProfileContext / MealsContext&lt;br&gt;локальное хранение (AsyncStorage, на устройстве)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E7EBFF;strokeColor=#4C6EF5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="490" width="300" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="n6" value="DraftMealContext&lt;br&gt;черновик текущего блюда (в памяти, не сохраняется)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="510" width="300" height="45" as="geometry" />
+        <mxCell id="n6" value="DraftMealContext&lt;br&gt;черновик текущего блюда (в памяти, не сохраняется)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E7EBFF;strokeColor=#4C6EF5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="550" width="300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="n7" value="meal-analysis-api.ts&lt;br&gt;клиент Supabase (@supabase/supabase-js)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="60" y="565" width="300" height="45" as="geometry" />
+        <mxCell id="n7" value="meal-analysis-api.ts&lt;br&gt;клиент Supabase (@supabase/supabase-js)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E7EBFF;strokeColor=#4C6EF5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="605" width="300" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="n8" value="health-connect.ts&lt;br&gt;react-native-health-connect (пропатчен через patch-package); one-way запись при addMeal/updateMeal" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E7EBFF;strokeColor=#4C6EF5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="660" width="300" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Health Connect (local Android system component, not a network API) -->
+        <mxCell id="hc" value="Android Health Connect&lt;br&gt;системное хранилище на устройстве (не сеть) — NutritionRecord (калории+БЖУК); разрешение android.permission.health.WRITE_NUTRITION" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#E1F7F5;strokeColor=#0C8599;strokeWidth=1.5;fontSize=11;fontFamily=Helvetica;fontColor=#0B5B63;" vertex="1" parent="1">
+          <mxGeometry x="40" y="740" width="340" height="70" as="geometry" />
         </mxCell>
 
         <!-- Container 2: Backend -->
-        <mxCell id="container2" value="Бэкенд — Supabase Edge Functions (Deno, хостинг Supabase)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#82b366;verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;fontStyle=1;fontSize=13;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="420" y="140" width="320" height="430" as="geometry" />
+        <mxCell id="container2" value="БЭКЕНД — Supabase Edge Functions (Deno, хостинг Supabase)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#F3FAF3;strokeColor=#2F9E44;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontStyle=1;fontSize=12;fontFamily=Helvetica;fontColor=#2B8A3E;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="420" y="170" width="320" height="430" as="geometry" />
         </mxCell>
 
-        <mxCell id="b1a" value="recognize-meal&lt;br&gt;фото → Gemini: name_ru + name_search + граммы (шаг 1 из 2)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="440" y="190" width="280" height="60" as="geometry" />
+        <mxCell id="b1a" value="recognize-meal&lt;br&gt;фото → Gemini: name_ru + name_search + граммы (шаг 1 из 2)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#DEF3E0;strokeColor=#2F9E44;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="440" y="220" width="280" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="b1b" value="lookup-nutrients&lt;br&gt;массив ингредиентов → USDA даёт нутриенты каждому (шаг 2 из 2)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="440" y="260" width="280" height="60" as="geometry" />
+        <mxCell id="b1b" value="lookup-nutrients&lt;br&gt;массив ингредиентов → USDA даёт нутриенты каждому (шаг 2 из 2)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#DEF3E0;strokeColor=#2F9E44;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="440" y="290" width="280" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="b2" value="lookup-ingredient&lt;br&gt;ручной ввод: Gemini переводит название → поиск в USDA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="440" y="330" width="280" height="60" as="geometry" />
+        <mxCell id="b2" value="lookup-ingredient&lt;br&gt;ручной ввод: Gemini переводит название → поиск в USDA" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#DEF3E0;strokeColor=#2F9E44;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="440" y="360" width="280" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="b3" value="_shared/gemini.ts — вызовы Gemini API, ретраи на 429/503; отдельно просит raw/cooked для еды, но НЕ для напитков" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="440" y="400" width="280" height="50" as="geometry" />
+        <mxCell id="b3" value="_shared/gemini.ts — вызовы Gemini API, ретраи на 429/503; отдельно просит raw/cooked для еды, но НЕ для напитков" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#DEF3E0;strokeColor=#2F9E44;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="440" y="430" width="280" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="b4" value="_shared/usda.ts — поиск в USDA (Foundation+SR Legacy+FNDDS), фикс ккал/кДж, ретраи на 400 (до 4 раз)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="440" y="460" width="280" height="50" as="geometry" />
+        <mxCell id="b4" value="_shared/usda.ts — поиск в USDA (Foundation+SR Legacy+FNDDS), фикс ккал/кДж, ретраи на 400 (до 4 раз)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#DEF3E0;strokeColor=#2F9E44;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="440" y="490" width="280" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="b5" value="Supabase Secrets&lt;br&gt;GEMINI_API_KEY, FDC_API_KEY, GEMINI_MODEL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="440" y="520" width="280" height="40" as="geometry" />
+        <mxCell id="b5" value="Supabase Secrets&lt;br&gt;GEMINI_API_KEY, FDC_API_KEY, GEMINI_MODEL" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFF7DB;strokeColor=#E8B339;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#5C4A0A;" vertex="1" parent="1">
+          <mxGeometry x="440" y="550" width="280" height="40" as="geometry" />
         </mxCell>
 
         <!-- Container 3: External APIs -->
-        <mxCell id="container3" value="Внешние API (вызываются только с бэкенда)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#d79b00;verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;fontStyle=1;fontSize=13;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="800" y="140" width="280" height="290" as="geometry" />
+        <mxCell id="container3" value="ВНЕШНИЕ API (вызываются только с бэкенда)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFF6EE;strokeColor=#E8590C;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontStyle=1;fontSize=12;fontFamily=Helvetica;fontColor=#D9480F;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="800" y="170" width="280" height="290" as="geometry" />
         </mxCell>
 
-        <mxCell id="e1" value="Gemini API (gemini-2.5-flash)&lt;br&gt;распознавание фото + перевод названий&lt;br&gt;платный тир (был лимит free tier 20 запросов/день)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="820" y="190" width="240" height="90" as="geometry" />
+        <mxCell id="e1" value="Gemini API (gemini-2.5-flash)&lt;br&gt;распознавание фото + перевод названий&lt;br&gt;платный тир (был лимит free tier 20 запросов/день)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFE3CC;strokeColor=#E8590C;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="820" y="220" width="240" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="e2" value="USDA FoodData Central&lt;br&gt;нутриенты на 100г: Foundation, SR Legacy, Survey (FNDDS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="820" y="295" width="240" height="100" as="geometry" />
+        <mxCell id="e2" value="USDA FoodData Central&lt;br&gt;нутриенты на 100г: Foundation, SR Legacy, Survey (FNDDS)" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFE3CC;strokeColor=#E8590C;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="820" y="325" width="240" height="100" as="geometry" />
         </mxCell>
 
         <!-- Container 4: Build & Deploy -->
-        <mxCell id="container4" value="Репозиторий, сборка и деплой" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#9673a6;verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;fontStyle=1;fontSize=13;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="420" y="650" width="660" height="140" as="geometry" />
+        <mxCell id="container4" value="РЕПОЗИТОРИЙ, СБОРКА И ДЕПЛОЙ" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FAF4FC;strokeColor=#9C36B5;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontStyle=1;fontSize=12;fontFamily=Helvetica;fontColor=#9C36B5;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="420" y="680" width="660" height="140" as="geometry" />
         </mxCell>
 
-        <mxCell id="d1" value="GitHub&lt;br&gt;Tuzikov/Edazdrav, ветка main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="440" y="700" width="190" height="70" as="geometry" />
+        <mxCell id="d1" value="GitHub&lt;br&gt;Tuzikov/Edazdrav — ветка main, фичи через feature-ветку + PR" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#F1DFF7;strokeColor=#9C36B5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="440" y="730" width="190" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="d2" value="EAS Build (облако)&lt;br&gt;профиль «preview» → APK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="650" y="700" width="190" height="70" as="geometry" />
+        <mxCell id="d2" value="EAS Build (облако)&lt;br&gt;профиль «preview» → APK" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#F1DFF7;strokeColor=#9C36B5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="650" y="730" width="190" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="d3" value="Supabase CLI&lt;br&gt;functions deploy / secrets set" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="860" y="700" width="190" height="70" as="geometry" />
+        <mxCell id="d3" value="Supabase CLI&lt;br&gt;functions deploy / secrets set" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#F1DFF7;strokeColor=#9C36B5;strokeWidth=1.2;fontSize=11;fontFamily=Helvetica;fontColor=#1A1A2E;" vertex="1" parent="1">
+          <mxGeometry x="860" y="730" width="190" height="70" as="geometry" />
         </mxCell>
 
         <!-- Legend / note -->
-        <mxCell id="note" value="Обновлено: 16 июля 2026 — анализ фото разделён на 2 отдельных запроса (recognize-meal → lookup-nutrients), UI показывает текущий этап, чтобы было видно, где именно завис запрос; добавлено ручное добавление приёма пищи без фото; исправлены баги с напитками (Gemini лишний раз добавлял «raw» к воде/сокам — ломало поиск в USDA; сам USDA-поиск иногда отдаёт 400 без причины — усилен ретрай до 4 попыток); включён платный тир Gemini (снят лимит free tier 20 запросов/день); ребрендинг — иконка и имя «Едазавр»; исправлен отступ под статус-бар на Android (react-native-edge-to-edge)." style="text;html=1;fontSize=11;fontStyle=2;align=left;verticalAlign=top;whiteSpace=wrap;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="40" y="800" width="1020" height="60" as="geometry" />
+        <mxCell id="noteBar" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F3680F;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="830" width="4" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="noteLabel" value="ОБНОВЛЕНО 12 АВГУСТА 2026" style="text;html=1;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#D9480F;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="56" y="828" width="300" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="note" value="Редизайн «Сочный» — тёплая оранжевая палитра вместо чёрно-белой (src/constants/theme.ts), применена по всему приложению. Добавлена синхронизация с Android Health Connect — one-way запись NutritionRecord (калории+БЖУК) при сохранении/редактировании приёма пищи, тумблер в Профиле, выключена по умолчанию; библиотека react-native-health-connect пропатчена через patch-package (requestPermission молча проглатывала нативные ошибки). Добавлен ручной переключатель темы (Системная/Светлая/Тёмная), раньше тема жёстко следовала за системной. Рабочий процесс для новых фич теперь — feature-ветка + PR в GitHub, а не прямые коммиты в main." style="text;html=1;fontSize=11;fontFamily=Helvetica;fontColor=#495057;align=left;verticalAlign=top;whiteSpace=wrap;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="56" y="846" width="1000" height="60" as="geometry" />
         </mxCell>
 
         <!-- Edges -->
-        <mxCell id="e_user_n4" value="фотографирует блюдо / открывает приложение" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="user" target="n4">
+        <mxCell id="e_user_n4" value="фотографирует блюдо / открывает приложение" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;fontColor=#495057;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="user" target="n4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_n4_n7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="n4" target="n7">
+        <mxCell id="e_n4_n7" value="сохраняет приём пищи" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;fontColor=#495057;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n4" target="n7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="e_n7_b1a" value="1) POST recognize-meal&lt;br&gt;{imageBase64, mimeType}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="n7" target="b1a">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e_n5_n8" value="addMeal() / updateMeal()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#0C8599;fontColor=#0B5B63;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="n5" target="n8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="40" y="515" />
+              <mxPoint x="40" y="685" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="e_b1a_n7" value="name_ru + name_search + граммы" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;fontSize=9;exitX=0;exitY=0.3;entryX=1;entryY=0.3;" edge="1" parent="1" source="b1a" target="n7">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e_n7_b1b" value="2) POST lookup-nutrients&lt;br&gt;{ingredients}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="n7" target="b1b">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e_b1b_n7" value="ингредиенты + БЖУ/ккал (JSON)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;fontSize=9;exitX=0;exitY=0.7;entryX=1;entryY=0.5;" edge="1" parent="1" source="b1b" target="n7">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e_n7_b2" value="POST lookup-ingredient&lt;br&gt;{nameRu, grams}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="n7" target="b2">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e_b2_n7" value="нутриенты (JSON)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;fontSize=9;exitX=0;exitY=0.9;entryX=1;entryY=0.9;" edge="1" parent="1" source="b2" target="n7">
+        <mxCell id="e_n8_hc" value="insertRecords() / requestPermission() — только запись, без чтения" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#0C8599;fontColor=#0B5B63;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n8" target="hc">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="e_b1a_b3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="b1a" target="b3">
+        <mxCell id="e_n7_b1a" value="1) POST recognize-meal&lt;br&gt;{imageBase64, mimeType}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;fontColor=#495057;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n7" target="b1a">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_b1b_b4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="b1b" target="b4">
+        <mxCell id="e_b1a_n7" value="name_ru + name_search + граммы" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;dashed=1;fontSize=9;fontFamily=Helvetica;strokeColor=#ADB5BD;fontColor=#868E96;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.3;entryX=1;entryY=0.3;" edge="1" parent="1" source="b1a" target="n7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_b2_b3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="b2" target="b3">
+        <mxCell id="e_n7_b1b" value="2) POST lookup-nutrients&lt;br&gt;{ingredients}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;fontColor=#495057;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n7" target="b1b">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_b2_b4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="b2" target="b4">
+        <mxCell id="e_b1b_n7" value="ингредиенты + БЖУ/ккал (JSON)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;dashed=1;fontSize=9;fontFamily=Helvetica;strokeColor=#ADB5BD;fontColor=#868E96;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.7;entryX=1;entryY=0.5;" edge="1" parent="1" source="b1b" target="n7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="e_b3_e1" value="generateContent()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="b3" target="e1">
+        <mxCell id="e_n7_b2" value="POST lookup-ingredient&lt;br&gt;{nameRu, grams}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;fontColor=#495057;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="n7" target="b2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_b4_e2" value="GET /foods/search" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="b4" target="e2">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <mxCell id="e_b5_b1a" value="секреты (env)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;fontSize=9;" edge="1" parent="1" source="b5" target="b1a">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e_b5_b1b" value="секреты (env)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;fontSize=9;" edge="1" parent="1" source="b5" target="b1b">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e_b5_b2" value="секреты (env)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;fontSize=9;" edge="1" parent="1" source="b5" target="b2">
+        <mxCell id="e_b2_n7" value="нутриенты (JSON)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;dashed=1;fontSize=9;fontFamily=Helvetica;strokeColor=#ADB5BD;fontColor=#868E96;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.9;entryX=1;entryY=0.9;" edge="1" parent="1" source="b2" target="n7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="e_d1_d2" value="eas build --profile preview" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="d1" target="d2">
+        <mxCell id="e_b1a_b3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;" edge="1" parent="1" source="b1a" target="b3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_d1_d3" value="supabase functions deploy" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="d1" target="d3">
+        <mxCell id="e_b1b_b4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;" edge="1" parent="1" source="b1b" target="b4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_d2_c1" value="APK устанавливается на телефон" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;dashed=1;" edge="1" parent="1" source="d2" target="container1">
+        <mxCell id="e_b2_b3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;" edge="1" parent="1" source="b2" target="b3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_d3_c2" value="обновляет код функций" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;dashed=1;" edge="1" parent="1" source="d3" target="container2">
+        <mxCell id="e_b2_b4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#5C6773;" edge="1" parent="1" source="b2" target="b4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_b3_e1" value="generateContent()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#E8590C;fontColor=#D9480F;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b3" target="e1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_b4_e2" value="GET /foods/search" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#E8590C;fontColor=#D9480F;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b4" target="e2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_b5_b1a" value="секреты (env)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;dashed=1;fontSize=9;fontFamily=Helvetica;strokeColor=#E8B339;fontColor=#8A6D1A;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b5" target="b1a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_b5_b1b" value="секреты (env)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;dashed=1;fontSize=9;fontFamily=Helvetica;strokeColor=#E8B339;fontColor=#8A6D1A;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b5" target="b1b">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_b5_b2" value="секреты (env)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;dashed=1;fontSize=9;fontFamily=Helvetica;strokeColor=#E8B339;fontColor=#8A6D1A;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="b5" target="b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_d1_d2" value="eas build --profile preview" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#9C36B5;fontColor=#862E9C;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="d1" target="d2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d1_d3" value="supabase functions deploy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#9C36B5;fontColor=#862E9C;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="d1" target="d3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d2_c1" value="APK устанавливается на телефон" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#9C36B5;fontColor=#862E9C;labelBackgroundColor=#FFFFFF;dashed=1;" edge="1" parent="1" source="d2" target="container1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d3_c2" value="обновляет код функций" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;fontSize=10;fontFamily=Helvetica;strokeColor=#9C36B5;fontColor=#862E9C;labelBackgroundColor=#FFFFFF;dashed=1;" edge="1" parent="1" source="d3" target="container2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
