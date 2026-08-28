@@ -69,3 +69,42 @@ Respond with ONLY the search term (2-5 words), nothing else.`;
   const text = await callGemini(apiKey, model, [{ text: prompt }]);
   return text.trim();
 }
+
+type NutrientSnapshot = {
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  fiber: number;
+};
+
+export type NutritionAdviceStats = {
+  periodLabel: string;
+  days: number;
+  totals: NutrientSnapshot;
+  averages: NutrientSnapshot;
+  goals: NutrientSnapshot;
+};
+
+function formatSnapshot(s: NutrientSnapshot): string {
+  return `${Math.round(s.calories)} ккал, белки ${s.protein.toFixed(1)} г, жиры ${s.fat.toFixed(1)} г, углеводы ${s.carbs.toFixed(1)} г, клетчатка ${s.fiber.toFixed(1)} г`;
+}
+
+// Сводка за период (факт/план по калориям и БЖУК) → текстовые рекомендации
+// по рациону и активности. Отправляется только по нажатию кнопки на клиенте,
+// не автоматически.
+export async function getNutritionAdvice(stats: NutritionAdviceStats, apiKey: string, model: string): Promise<string> {
+  const { periodLabel, days, totals, averages, goals } = stats;
+
+  const prompt = `Ты — ассистент по питанию в приложении подсчёта калорий «Едазавр». Пользователь смотрит свою статистику за период и просит рекомендации.
+
+Период: ${periodLabel} (${days} дн.)
+Дневная цель: ${formatSnapshot(goals)}
+Итого за период: ${formatSnapshot(totals)}
+В среднем в день: ${formatSnapshot(averages)}
+
+Дай короткие практические рекомендации по рациону и физической активности на основе этих чисел: где отклонение от плана заметнее всего (недобор или перебор по калориям/нутриентам), что стоит скорректировать в питании, какая активность уместна (если калорий стабильно больше плана — что поможет сжечь разницу; если сильно меньше — предупреди не переусердствовать с дефицитом). Пиши по-русски, простым языком, 4-6 предложений или короткий список без markdown-разметки (без **, #, списков через *) — только конкретика, отталкивающаяся от чисел выше, без общих фраз ни о чём.`;
+
+  const text = await callGemini(apiKey, model, [{ text: prompt }]);
+  return text.trim();
+}
