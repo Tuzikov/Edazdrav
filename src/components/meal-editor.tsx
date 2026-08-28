@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Alert, FlatList, Image, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { lookupIngredientOnline } from '@/lib/meal-analysis-api';
-import { sumIngredients, type Ingredient } from '@/lib/nutrition';
+import { scaleIngredient, sumIngredients, type Ingredient } from '@/lib/nutrition';
 
 type Props = {
   photoUri?: string | null;
@@ -24,8 +24,14 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
   const [newGrams, setNewGrams] = useState('100');
   const [isAdding, setIsAdding] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
+  const listRef = useRef<FlatList>(null);
 
   const totals = useMemo(() => sumIngredients(ingredients), [ingredients]);
+
+  function scrollToBottom() {
+    // список ещё не перерисовался с новой высотой футера — ждём кадр
+    requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
+  }
 
   async function handleAddIngredient() {
     const name = newName.trim();
@@ -48,9 +54,11 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
 
   return (
     <FlatList
+      ref={listRef}
       data={ingredients}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContent}
+      keyboardShouldPersistTaps="handled"
       ListHeaderComponent={
         <>
           {photoUri ? <Image source={{ uri: photoUri }} style={styles.photo} /> : null}
@@ -61,9 +69,14 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
       }
       renderItem={({ item }) => (
         <View style={styles.ingredientRow}>
-          <ThemedText type="default" style={styles.ingredientName} numberOfLines={1}>
-            {item.nameRu}
-          </ThemedText>
+          <View style={styles.ingredientNameBlock}>
+            <ThemedText type="default" numberOfLines={1}>
+              {item.nameRu}
+            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              ≈{Math.round(scaleIngredient(item).calories)} ккал
+            </ThemedText>
+          </View>
           <TextInput
             style={[styles.gramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
             keyboardType="numeric"
@@ -92,6 +105,7 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
                 value={newName}
                 onChangeText={setNewName}
                 autoFocus
+                onFocus={scrollToBottom}
                 editable={!isLookingUp}
                 onSubmitEditing={handleAddIngredient}
               />
@@ -102,6 +116,7 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
                 placeholderTextColor={theme.textSecondary}
                 value={newGrams}
                 onChangeText={setNewGrams}
+                onFocus={scrollToBottom}
                 editable={!isLookingUp}
                 onSubmitEditing={handleAddIngredient}
               />
@@ -119,7 +134,12 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
               </Pressable>
             </View>
           ) : (
-            <Pressable style={styles.addIngredientButton} onPress={() => setIsAdding(true)}>
+            <Pressable
+              style={styles.addIngredientButton}
+              onPress={() => {
+                setIsAdding(true);
+                scrollToBottom();
+              }}>
               <Ionicons name="add-circle-outline" size={20} color={theme.accent} />
               <ThemedText type="smallBold">Добавить ингредиент</ThemedText>
             </Pressable>
@@ -175,7 +195,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(120,120,128,0.15)',
   },
-  ingredientName: { flex: 1 },
+  ingredientNameBlock: { flex: 1, gap: 2 },
   gramsInput: {
     borderWidth: 1,
     borderRadius: Spacing.two,
