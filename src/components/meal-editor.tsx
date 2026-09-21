@@ -1,6 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ActivityIndicator, Alert, FlatList, Image, Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -29,9 +41,17 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
   const totals = useMemo(() => sumIngredients(ingredients), [ingredients]);
 
   // requestAnimationFrame ждёт только один кадр — недостаточно на Android,
-  // где анимация клавиатуры и связанный с ней ресайз окна (adjustResize)
-  // длятся заметно дольше. Подписываемся на реальное событие появления
-  // клавиатуры и скроллим уже после того, как ОС подтвердила, что она видна.
+  // где анимация клавиатуры длится заметно дольше. Подписываемся на
+  // реальное событие появления клавиатуры и скроллим уже после того, как
+  // ОС подтвердила, что она видна.
+  //
+  // adjustResize тут не срабатывает: react-native-edge-to-edge (см.
+  // app.json) рисует окно edge-to-edge, из-за чего нативный ресайз окна
+  // при появлении клавиатуры на Android не происходит — FlatList не
+  // сжимается, клавиатура просто перекрывает нижнюю часть экрана поверх
+  // него. Поэтому высоту вручную ужимает KeyboardAvoidingView ниже
+  // (behavior "height" на Android уменьшает layout через JS, не полагаясь
+  // на нативный windowSoftInputMode).
   useEffect(() => {
     const subscription = Keyboard.addListener('keyboardDidShow', () => {
       listRef.current?.scrollToEnd({ animated: true });
@@ -59,130 +79,133 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
   }
 
   return (
-    <FlatList
-      ref={listRef}
-      data={ingredients}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.listContent}
-      keyboardShouldPersistTaps="handled"
-      ListHeaderComponent={
-        <>
-          {photoUri ? <Image source={{ uri: photoUri }} style={styles.photo} /> : null}
-          <ThemedText type="smallBold" style={styles.sectionTitle}>
-            Ингредиенты
-          </ThemedText>
-        </>
-      }
-      renderItem={({ item }) => (
-        <View style={styles.ingredientRow}>
-          <View style={styles.ingredientNameBlock}>
-            <ThemedText type="default" numberOfLines={1}>
-              {item.nameRu}
+    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <FlatList
+        ref={listRef}
+        data={ingredients}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          <>
+            {photoUri ? <Image source={{ uri: photoUri }} style={styles.photo} /> : null}
+            <ThemedText type="smallBold" style={styles.sectionTitle}>
+              Ингредиенты
             </ThemedText>
+          </>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.ingredientRow}>
+            <View style={styles.ingredientNameBlock}>
+              <ThemedText type="default" numberOfLines={1}>
+                {item.nameRu}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                ≈{Math.round(scaleIngredient(item).calories)} ккал
+              </ThemedText>
+            </View>
+            <TextInput
+              style={[styles.gramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
+              keyboardType="numeric"
+              value={String(item.grams)}
+              onChangeText={(text) => {
+                const parsed = Number(text);
+                onUpdateGrams(item.id, Number.isNaN(parsed) ? 0 : parsed);
+              }}
+            />
             <ThemedText type="small" themeColor="textSecondary">
-              ≈{Math.round(scaleIngredient(item).calories)} ккал
+              г
             </ThemedText>
-          </View>
-          <TextInput
-            style={[styles.gramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
-            keyboardType="numeric"
-            value={String(item.grams)}
-            onChangeText={(text) => {
-              const parsed = Number(text);
-              onUpdateGrams(item.id, Number.isNaN(parsed) ? 0 : parsed);
-            }}
-          />
-          <ThemedText type="small" themeColor="textSecondary">
-            г
-          </ThemedText>
-          <Pressable onPress={() => onRemoveIngredient(item.id)} hitSlop={8}>
-            <Ionicons name="close-circle-outline" size={22} color={theme.textSecondary} />
-          </Pressable>
-        </View>
-      )}
-      ListFooterComponent={
-        <View>
-          {isAdding ? (
-            <View style={styles.addRow}>
-              <TextInput
-                style={[styles.addInput, { color: theme.text, borderColor: theme.textSecondary }]}
-                placeholder="Название продукта"
-                placeholderTextColor={theme.textSecondary}
-                value={newName}
-                onChangeText={setNewName}
-                autoFocus
-                editable={!isLookingUp}
-                onSubmitEditing={handleAddIngredient}
-              />
-              <TextInput
-                style={[styles.addGramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
-                keyboardType="numeric"
-                placeholder="г"
-                placeholderTextColor={theme.textSecondary}
-                value={newGrams}
-                onChangeText={setNewGrams}
-                editable={!isLookingUp}
-                onSubmitEditing={handleAddIngredient}
-              />
-              <Pressable
-                onPress={handleAddIngredient}
-                style={[styles.addConfirm, { backgroundColor: theme.accentButton }]}
-                disabled={isLookingUp}>
-                {isLookingUp ? (
-                  <ActivityIndicator size="small" color={theme.onAccent} />
-                ) : (
-                  <ThemedText type="smallBold" style={styles.addConfirmText}>
-                    Добавить
-                  </ThemedText>
-                )}
-              </Pressable>
-            </View>
-          ) : (
-            <Pressable style={styles.addIngredientButton} onPress={() => setIsAdding(true)}>
-              <Ionicons name="add-circle-outline" size={20} color={theme.accent} />
-              <ThemedText type="smallBold">Добавить ингредиент</ThemedText>
+            <Pressable onPress={() => onRemoveIngredient(item.id)} hitSlop={8}>
+              <Ionicons name="close-circle-outline" size={22} color={theme.textSecondary} />
             </Pressable>
-          )}
+          </View>
+        )}
+        ListFooterComponent={
+          <View>
+            {isAdding ? (
+              <View style={styles.addRow}>
+                <TextInput
+                  style={[styles.addInput, { color: theme.text, borderColor: theme.textSecondary }]}
+                  placeholder="Название продукта"
+                  placeholderTextColor={theme.textSecondary}
+                  value={newName}
+                  onChangeText={setNewName}
+                  autoFocus
+                  editable={!isLookingUp}
+                  onSubmitEditing={handleAddIngredient}
+                />
+                <TextInput
+                  style={[styles.addGramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
+                  keyboardType="numeric"
+                  placeholder="г"
+                  placeholderTextColor={theme.textSecondary}
+                  value={newGrams}
+                  onChangeText={setNewGrams}
+                  editable={!isLookingUp}
+                  onSubmitEditing={handleAddIngredient}
+                />
+                <Pressable
+                  onPress={handleAddIngredient}
+                  style={[styles.addConfirm, { backgroundColor: theme.accentButton }]}
+                  disabled={isLookingUp}>
+                  {isLookingUp ? (
+                    <ActivityIndicator size="small" color={theme.onAccent} />
+                  ) : (
+                    <ThemedText type="smallBold" style={styles.addConfirmText}>
+                      Добавить
+                    </ThemedText>
+                  )}
+                </Pressable>
+              </View>
+            ) : (
+              <Pressable style={styles.addIngredientButton} onPress={() => setIsAdding(true)}>
+                <Ionicons name="add-circle-outline" size={20} color={theme.accent} />
+                <ThemedText type="smallBold">Добавить ингредиент</ThemedText>
+              </Pressable>
+            )}
 
-          <ThemedView type="backgroundElement" style={styles.totalsCard}>
-            <View style={styles.totalsRow}>
-              <ThemedText type="smallBold">Калории</ThemedText>
-              <ThemedText type="smallBold">{Math.round(totals.calories)} ккал</ThemedText>
-            </View>
-            <View style={styles.totalsRow}>
-              <ThemedText type="small" themeColor="textSecondary">
-                Белки
-              </ThemedText>
-              <ThemedText type="small">{totals.protein.toFixed(1)} г</ThemedText>
-            </View>
-            <View style={styles.totalsRow}>
-              <ThemedText type="small" themeColor="textSecondary">
-                Жиры
-              </ThemedText>
-              <ThemedText type="small">{totals.fat.toFixed(1)} г</ThemedText>
-            </View>
-            <View style={styles.totalsRow}>
-              <ThemedText type="small" themeColor="textSecondary">
-                Углеводы
-              </ThemedText>
-              <ThemedText type="small">{totals.carbs.toFixed(1)} г</ThemedText>
-            </View>
-            <View style={styles.totalsRow}>
-              <ThemedText type="small" themeColor="textSecondary">
-                Клетчатка
-              </ThemedText>
-              <ThemedText type="small">{totals.fiber.toFixed(1)} г</ThemedText>
-            </View>
-          </ThemedView>
+            <ThemedView type="backgroundElement" style={styles.totalsCard}>
+              <View style={styles.totalsRow}>
+                <ThemedText type="smallBold">Калории</ThemedText>
+                <ThemedText type="smallBold">{Math.round(totals.calories)} ккал</ThemedText>
+              </View>
+              <View style={styles.totalsRow}>
+                <ThemedText type="small" themeColor="textSecondary">
+                  Белки
+                </ThemedText>
+                <ThemedText type="small">{totals.protein.toFixed(1)} г</ThemedText>
+              </View>
+              <View style={styles.totalsRow}>
+                <ThemedText type="small" themeColor="textSecondary">
+                  Жиры
+                </ThemedText>
+                <ThemedText type="small">{totals.fat.toFixed(1)} г</ThemedText>
+              </View>
+              <View style={styles.totalsRow}>
+                <ThemedText type="small" themeColor="textSecondary">
+                  Углеводы
+                </ThemedText>
+                <ThemedText type="small">{totals.carbs.toFixed(1)} г</ThemedText>
+              </View>
+              <View style={styles.totalsRow}>
+                <ThemedText type="small" themeColor="textSecondary">
+                  Клетчатка
+                </ThemedText>
+                <ThemedText type="small">{totals.fiber.toFixed(1)} г</ThemedText>
+              </View>
+            </ThemedView>
 
-          {footer}
-        </View>
-      }
-    />
+            {footer}
+          </View>
+        }
+      />
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   listContent: { paddingHorizontal: Spacing.three, paddingBottom: Spacing.four },
   photo: { width: '100%', height: 200, borderRadius: Spacing.three, marginTop: Spacing.two },
   sectionTitle: { marginTop: Spacing.three, marginBottom: Spacing.two },
