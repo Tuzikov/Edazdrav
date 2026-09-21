@@ -1,17 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState, type ReactNode } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardStickyView } from 'react-native-keyboard-controller';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -58,7 +48,7 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
   }
 
   return (
-    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <View style={styles.flex}>
       <FlatList
         data={ingredients}
         keyExtractor={(item) => item.id}
@@ -144,50 +134,60 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
         }
       />
       {isAdding && (
-        // Строка ввода вынесена из ListFooterComponent и рендерится здесь,
-        // прямо под FlatList — как закреплённая панель поверх клавиатуры
-        // (KeyboardAvoidingView ужимает высоту FlatList, а не этой панели).
-        // Раньше строка ввода лежала внутри скроллящегося списка после
-        // карточки итогов и кнопки сохранения — автоскролл к концу списка
-        // уводил именно к ним, а не к самому полю ввода, так что оно всё
-        // равно пряталось за клавиатурой. Так поле гарантированно видно
-        // без скролла, независимо от того, сколько ингредиентов в списке.
-        <View style={[styles.addRow, { borderTopColor: theme.textSecondary + '26' }]}>
-          <TextInput
-            style={[styles.addInput, { color: theme.text, borderColor: theme.textSecondary }]}
-            placeholder="Название продукта"
-            placeholderTextColor={theme.textSecondary}
-            value={newName}
-            onChangeText={setNewName}
-            autoFocus
-            editable={!isLookingUp}
-            onSubmitEditing={handleAddIngredient}
-          />
-          <TextInput
-            style={[styles.addGramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
-            keyboardType="numeric"
-            placeholder="г"
-            placeholderTextColor={theme.textSecondary}
-            value={newGrams}
-            onChangeText={setNewGrams}
-            editable={!isLookingUp}
-            onSubmitEditing={handleAddIngredient}
-          />
-          <Pressable
-            onPress={handleAddIngredient}
-            style={[styles.addConfirm, { backgroundColor: theme.accentButton }]}
-            disabled={isLookingUp}>
-            {isLookingUp ? (
-              <ActivityIndicator size="small" color={theme.onAccent} />
-            ) : (
-              <ThemedText type="smallBold" style={styles.addConfirmText}>
-                Добавить
-              </ThemedText>
-            )}
-          </Pressable>
-        </View>
+        // Строка ввода вынесена из ListFooterComponent — раньше она лежала
+        // внутри скроллящегося списка после карточки итогов и кнопки
+        // сохранения, и любой автоскролл к концу списка уводил мимо неё.
+        //
+        // RN-овский KeyboardAvoidingView (behavior="height") здесь не
+        // помог вообще: на реальном устройстве при показе клавиатуры
+        // панель просто оставалась внизу экрана, у системной навигации, и
+        // клавиатура перекрывала её — известная ненадёжность встроенного
+        // KeyboardAvoidingView на Android, усугублённая edge-to-edge
+        // (react-native-edge-to-edge, см. app.json), который ломает
+        // нативный adjustResize (см. «На заметку» в HANDOFF.md).
+        // KeyboardStickyView из react-native-keyboard-controller решает
+        // это на уровне нативных инсетов клавиатуры (WindowInsetsAnimation
+        // на Android) и специально сделан для панелей ввода поверх
+        // клавиатуры — требует <KeyboardProvider> в корне приложения
+        // (src/app/_layout.tsx).
+        <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
+          <View style={[styles.addRow, { backgroundColor: theme.background, borderTopColor: theme.textSecondary + '26' }]}>
+            <TextInput
+              style={[styles.addInput, { color: theme.text, borderColor: theme.textSecondary }]}
+              placeholder="Название продукта"
+              placeholderTextColor={theme.textSecondary}
+              value={newName}
+              onChangeText={setNewName}
+              autoFocus
+              editable={!isLookingUp}
+              onSubmitEditing={handleAddIngredient}
+            />
+            <TextInput
+              style={[styles.addGramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
+              keyboardType="numeric"
+              placeholder="г"
+              placeholderTextColor={theme.textSecondary}
+              value={newGrams}
+              onChangeText={setNewGrams}
+              editable={!isLookingUp}
+              onSubmitEditing={handleAddIngredient}
+            />
+            <Pressable
+              onPress={handleAddIngredient}
+              style={[styles.addConfirm, { backgroundColor: theme.accentButton }]}
+              disabled={isLookingUp}>
+              {isLookingUp ? (
+                <ActivityIndicator size="small" color={theme.onAccent} />
+              ) : (
+                <ThemedText type="smallBold" style={styles.addConfirmText}>
+                  Добавить
+                </ThemedText>
+              )}
+            </Pressable>
+          </View>
+        </KeyboardStickyView>
       )}
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 

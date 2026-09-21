@@ -2,6 +2,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { SystemBars } from 'react-native-edge-to-edge';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { DraftMealProvider } from '@/context/draft-meal-context';
 import { MealsProvider } from '@/context/meals-context';
@@ -37,8 +38,10 @@ function RootLayoutInner() {
 
 export default function RootLayout() {
   return (
-    <ThemePreferenceProvider>
-      <RootLayoutInner />
-    </ThemePreferenceProvider>
+    <KeyboardProvider>
+      <ThemePreferenceProvider>
+        <RootLayoutInner />
+      </ThemePreferenceProvider>
+    </KeyboardProvider>
   );
 }
