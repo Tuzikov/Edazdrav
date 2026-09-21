@@ -1,11 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   Alert,
   FlatList,
   Image,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -36,28 +35,8 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
   const [newGrams, setNewGrams] = useState('100');
   const [isAdding, setIsAdding] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
-  const listRef = useRef<FlatList>(null);
 
   const totals = useMemo(() => sumIngredients(ingredients), [ingredients]);
-
-  // requestAnimationFrame ждёт только один кадр — недостаточно на Android,
-  // где анимация клавиатуры длится заметно дольше. Подписываемся на
-  // реальное событие появления клавиатуры и скроллим уже после того, как
-  // ОС подтвердила, что она видна.
-  //
-  // adjustResize тут не срабатывает: react-native-edge-to-edge (см.
-  // app.json) рисует окно edge-to-edge, из-за чего нативный ресайз окна
-  // при появлении клавиатуры на Android не происходит — FlatList не
-  // сжимается, клавиатура просто перекрывает нижнюю часть экрана поверх
-  // него. Поэтому высоту вручную ужимает KeyboardAvoidingView ниже
-  // (behavior "height" на Android уменьшает layout через JS, не полагаясь
-  // на нативный windowSoftInputMode).
-  useEffect(() => {
-    const subscription = Keyboard.addListener('keyboardDidShow', () => {
-      listRef.current?.scrollToEnd({ animated: true });
-    });
-    return () => subscription.remove();
-  }, []);
 
   async function handleAddIngredient() {
     const name = newName.trim();
@@ -81,7 +60,6 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <FlatList
-        ref={listRef}
         data={ingredients}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
@@ -123,42 +101,7 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
         )}
         ListFooterComponent={
           <View>
-            {isAdding ? (
-              <View style={styles.addRow}>
-                <TextInput
-                  style={[styles.addInput, { color: theme.text, borderColor: theme.textSecondary }]}
-                  placeholder="Название продукта"
-                  placeholderTextColor={theme.textSecondary}
-                  value={newName}
-                  onChangeText={setNewName}
-                  autoFocus
-                  editable={!isLookingUp}
-                  onSubmitEditing={handleAddIngredient}
-                />
-                <TextInput
-                  style={[styles.addGramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
-                  keyboardType="numeric"
-                  placeholder="г"
-                  placeholderTextColor={theme.textSecondary}
-                  value={newGrams}
-                  onChangeText={setNewGrams}
-                  editable={!isLookingUp}
-                  onSubmitEditing={handleAddIngredient}
-                />
-                <Pressable
-                  onPress={handleAddIngredient}
-                  style={[styles.addConfirm, { backgroundColor: theme.accentButton }]}
-                  disabled={isLookingUp}>
-                  {isLookingUp ? (
-                    <ActivityIndicator size="small" color={theme.onAccent} />
-                  ) : (
-                    <ThemedText type="smallBold" style={styles.addConfirmText}>
-                      Добавить
-                    </ThemedText>
-                  )}
-                </Pressable>
-              </View>
-            ) : (
+            {!isAdding && (
               <Pressable style={styles.addIngredientButton} onPress={() => setIsAdding(true)}>
                 <Ionicons name="add-circle-outline" size={20} color={theme.accent} />
                 <ThemedText type="smallBold">Добавить ингредиент</ThemedText>
@@ -200,6 +143,50 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
           </View>
         }
       />
+      {isAdding && (
+        // Строка ввода вынесена из ListFooterComponent и рендерится здесь,
+        // прямо под FlatList — как закреплённая панель поверх клавиатуры
+        // (KeyboardAvoidingView ужимает высоту FlatList, а не этой панели).
+        // Раньше строка ввода лежала внутри скроллящегося списка после
+        // карточки итогов и кнопки сохранения — автоскролл к концу списка
+        // уводил именно к ним, а не к самому полю ввода, так что оно всё
+        // равно пряталось за клавиатурой. Так поле гарантированно видно
+        // без скролла, независимо от того, сколько ингредиентов в списке.
+        <View style={[styles.addRow, { borderTopColor: theme.textSecondary + '26' }]}>
+          <TextInput
+            style={[styles.addInput, { color: theme.text, borderColor: theme.textSecondary }]}
+            placeholder="Название продукта"
+            placeholderTextColor={theme.textSecondary}
+            value={newName}
+            onChangeText={setNewName}
+            autoFocus
+            editable={!isLookingUp}
+            onSubmitEditing={handleAddIngredient}
+          />
+          <TextInput
+            style={[styles.addGramsInput, { color: theme.text, borderColor: theme.textSecondary }]}
+            keyboardType="numeric"
+            placeholder="г"
+            placeholderTextColor={theme.textSecondary}
+            value={newGrams}
+            onChangeText={setNewGrams}
+            editable={!isLookingUp}
+            onSubmitEditing={handleAddIngredient}
+          />
+          <Pressable
+            onPress={handleAddIngredient}
+            style={[styles.addConfirm, { backgroundColor: theme.accentButton }]}
+            disabled={isLookingUp}>
+            {isLookingUp ? (
+              <ActivityIndicator size="small" color={theme.onAccent} />
+            ) : (
+              <ThemedText type="smallBold" style={styles.addConfirmText}>
+                Добавить
+              </ThemedText>
+            )}
+          </Pressable>
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -232,7 +219,14 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     paddingVertical: Spacing.three,
   },
-  addRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, paddingVertical: Spacing.two },
+  addRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
+    borderTopWidth: 1,
+  },
   addInput: {
     flex: 1,
     borderWidth: 1,
