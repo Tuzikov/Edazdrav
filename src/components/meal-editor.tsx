@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { ActivityIndicator, Alert, FlatList, Image, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { ActivityIndicator, Alert, FlatList, Image, Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -28,10 +28,16 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
 
   const totals = useMemo(() => sumIngredients(ingredients), [ingredients]);
 
-  function scrollToBottom() {
-    // список ещё не перерисовался с новой высотой футера — ждём кадр
-    requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
-  }
+  // requestAnimationFrame ждёт только один кадр — недостаточно на Android,
+  // где анимация клавиатуры и связанный с ней ресайз окна (adjustResize)
+  // длятся заметно дольше. Подписываемся на реальное событие появления
+  // клавиатуры и скроллим уже после того, как ОС подтвердила, что она видна.
+  useEffect(() => {
+    const subscription = Keyboard.addListener('keyboardDidShow', () => {
+      listRef.current?.scrollToEnd({ animated: true });
+    });
+    return () => subscription.remove();
+  }, []);
 
   async function handleAddIngredient() {
     const name = newName.trim();
@@ -105,7 +111,6 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
                 value={newName}
                 onChangeText={setNewName}
                 autoFocus
-                onFocus={scrollToBottom}
                 editable={!isLookingUp}
                 onSubmitEditing={handleAddIngredient}
               />
@@ -116,7 +121,6 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
                 placeholderTextColor={theme.textSecondary}
                 value={newGrams}
                 onChangeText={setNewGrams}
-                onFocus={scrollToBottom}
                 editable={!isLookingUp}
                 onSubmitEditing={handleAddIngredient}
               />
@@ -134,12 +138,7 @@ export function MealEditor({ photoUri, ingredients, onUpdateGrams, onRemoveIngre
               </Pressable>
             </View>
           ) : (
-            <Pressable
-              style={styles.addIngredientButton}
-              onPress={() => {
-                setIsAdding(true);
-                scrollToBottom();
-              }}>
+            <Pressable style={styles.addIngredientButton} onPress={() => setIsAdding(true)}>
               <Ionicons name="add-circle-outline" size={20} color={theme.accent} />
               <ThemedText type="smallBold">Добавить ингредиент</ThemedText>
             </Pressable>
