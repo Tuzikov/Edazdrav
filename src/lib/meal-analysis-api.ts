@@ -38,9 +38,14 @@ export async function analyzeMealPhoto(
   mimeType: string,
   onStageChange?: (stage: AnalysisStage) => void
 ): Promise<Ingredient[]> {
+  // timeout обязателен: supabase-js по умолчанию ничего не ограничивает, и
+  // если сеть подвиснет на отправке фото или сервер — на ответе, await
+  // зависает навечно без ошибки (экран "Анализ" при этом блокирует жест
+  // "назад" — пользователь застревал без возможности выйти).
   onStageChange?.('recognizing');
   const { data: recognized, error: recognizeError } = await supabase.functions.invoke<RecognizeMealResponse>('recognize-meal', {
     body: { imageBase64: base64, mimeType },
+    timeout: 60000,
   });
   if (recognizeError) throw recognizeError;
   if (!recognized || recognized.error) throw new Error(recognized?.error ?? 'Пустой ответ от сервера');
@@ -48,6 +53,7 @@ export async function analyzeMealPhoto(
   onStageChange?.('calculating');
   const { data: withNutrients, error: nutrientsError } = await supabase.functions.invoke<LookupNutrientsResponse>('lookup-nutrients', {
     body: { ingredients: recognized.ingredients },
+    timeout: 30000,
   });
   if (nutrientsError) throw nutrientsError;
   if (!withNutrients || withNutrients.error) throw new Error(withNutrients?.error ?? 'Пустой ответ от сервера');
@@ -64,6 +70,7 @@ export async function analyzeMealPhoto(
 export async function lookupIngredientOnline(nameRu: string, grams: number): Promise<Ingredient> {
   const { data, error } = await supabase.functions.invoke<LookupIngredientResponse>('lookup-ingredient', {
     body: { nameRu, grams },
+    timeout: 50000,
   });
 
   if (error) throw error;

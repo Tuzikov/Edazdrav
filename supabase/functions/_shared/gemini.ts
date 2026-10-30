@@ -12,10 +12,15 @@ async function callGemini(apiKey: string, model: string, parts: unknown[]): Prom
 
   let data: any;
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+    // Без signal fetch может зависнуть навсегда, если Gemini вообще не
+    // отвечает (не ошибка, а просто тишина) — тогда retry-цикл ниже даже
+    // не запустится, и клиент будет ждать бесконечно. 20с с запасом
+    // покрывает обычное время ответа Gemini на один запрос.
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body,
+      signal: AbortSignal.timeout(20000),
     });
 
     data = await response.json();

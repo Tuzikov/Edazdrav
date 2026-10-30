@@ -28,7 +28,9 @@ async function searchFoods(nameSearch: string, apiKey: string): Promise<any> {
   // 2 попытки было мало и иногда всё равно уходило в общий фолбэк.
   const retryDelaysMs = [500, 1000, 2000, 4000];
   for (let attempt = 0; attempt <= retryDelaysMs.length; attempt++) {
-    const res = await fetch(url.toString());
+    // Таймаут на случай, если USDA вообще не отвечает — иначе до retry-цикла
+    // дело не дойдёт, запрос просто зависнет (см. тот же приём в gemini.ts).
+    const res = await fetch(url.toString(), { signal: AbortSignal.timeout(10000) });
     if (res.ok) return res.json();
     if (attempt < retryDelaysMs.length) {
       await new Promise((resolve) => setTimeout(resolve, retryDelaysMs[attempt]));
